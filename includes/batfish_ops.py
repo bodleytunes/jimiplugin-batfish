@@ -27,15 +27,30 @@ class batfish_ops:
         # Load Batfish Questions
         load_questions()
 
-    def question_routing(src_ip, dst_ip, dst_port):
+    def question_routing(self, src_ip, dst_ip, dst_port):
 
-        traceroutes = (
-            bfq.traceroute(
-                startLocation="fortigate-vm64-kvm__configs__spoke1.cfg",
-                headers=HeaderConstraints(dstIps="8.8.8.8", applications=["dns"]),
-            )
-            .answer()
-            .frame()
-        )
+        dst_port_list = list([dst_port])
+
+        try:
+
+            if applications:
+                # todo - enter application as args
+                print("hello world")
+        except NameError:
+
+            if dst_port:
+                # todo - enter ports as args
+                traceroutes = (
+                    bfq.traceroute(
+                        startLocation="fortigate-vm64-kvm__configs__spoke1.cfg",
+                        headers=HeaderConstraints(
+                            dstIps=dst_ip, dstPorts=dst_port_list
+                        ),
+                    )
+                    .answer()
+                    .frame()
+                )
+
+        answer = traceroutes
 
         return answer

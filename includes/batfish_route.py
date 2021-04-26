@@ -72,7 +72,7 @@ class batfish_route:
 
         # TODO - batfish queries
         bat_ops = batfish_ops(SNAPSHOT_PATH=self.snapshots_dir)
-        answers = bat_ops.question_routing(src_ip, dst_ip, dst_port)
+        answers = bat_ops.question_routing(self.src_ip, self.dst_ip, self.dst_port)
 
         # return routing results
 
@@ -90,10 +90,14 @@ class batfish_route:
         return port
 
 
+SRC_IP = "10.1.255.100"
+DST_IP = "10.3.255.100"
+DST_PORT = "53"
+
 b = batfish_route(
-    src_ip=None,
-    dst_ip=None,
-    dst_port=None,
+    src_ip=SRC_IP,
+    dst_ip=DST_IP,
+    dst_port=DST_PORT,
     device_type=None,
     BATFISH_NETWORK=None,
     BATFISH_SERVER=None,
