@@ -70,11 +70,9 @@ class batfish_route:
 
         batfish_routes = {}
 
-        # do batfish
         # TODO - batfish queries
         bat_ops = batfish_ops(SNAPSHOT_PATH=self.snapshots_dir)
-        bat_ops.init_batfish()
-        answers = bat_ops.question_batfish()
+        answers = bat_ops.question_routing(src_ip, dst_ip, dst_port)
 
         # return routing results
 

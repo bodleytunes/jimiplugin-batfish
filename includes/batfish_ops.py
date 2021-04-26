@@ -12,6 +12,8 @@ class batfish_ops:
         self.BATFISH_SERVER = "10.12.12.134"
         self.SNAPSHOT_PATH = SNAPSHOT_PATH
 
+        self.init_batfish()
+
     def init_batfish(self):
 
         bf_session.host = self.BATFISH_SERVER
@@ -20,7 +22,20 @@ class batfish_ops:
         bf_set_network(self.NETWORK_NAME)
 
         # Initialize Batfish Snapshot
-        bf_init_snapshot(self.SNAPSHOT_PATH, name="Fortigate_ADVPN", overwrite=True)
+        bf_init_snapshot(self.SNAPSHOT_PATH, name=self.NETWORK_NAME, overwrite=True)
 
         # Load Batfish Questions
         load_questions()
+
+    def question_routing(src_ip, dst_ip, dst_port):
+
+        traceroutes = (
+            bfq.traceroute(
+                startLocation="fortigate-vm64-kvm__configs__spoke1.cfg",
+                headers=HeaderConstraints(dstIps="8.8.8.8", applications=["dns"]),
+            )
+            .answer()
+            .frame()
+        )
+
+        return answer
