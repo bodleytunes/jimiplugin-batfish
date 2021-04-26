@@ -4,8 +4,8 @@ from pybatfish.question.question import load_questions
 from pybatfish.datamodel.flow import HeaderConstraints
 
 
-class batfish:
-    def __init__(self, src_ip, dst_ip, dst_port) -> None:
+class batfish_route:
+    def __init__(self, src_ip: str, dst_ip: str, dst_port: int) -> None:
         self.src_ip = src_ip
         self.dst_ip = dst_ip
         self.dst_port = dst_port
