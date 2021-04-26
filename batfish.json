@@ -1,68 +1,108 @@
 {
-    "name" : "snmp",
-    "author" : "biscuit-thief",
-    "version" : 1.2,
-    "categories" : ["networking"],
-    "description" : "Execute SNMP queries against targets",
-    "icon" : null,
-    "requirements" : {
-        "jimi_min_version" : null,
-        "jimi_max_version" : null,
-        "plugins" : []
+    "name": "batfish_route",
+    "author": "jmc",
+    "version": 1.0,
+    "categories": [
+        "networking"
+    ],
+    "description": "Run api commands against a Batfish service to precalculate and validate routing policy and firewall rules",
+    "icon": null,
+    "requirements": {
+        "jimi_min_version": null,
+        "jimi_max_version": null,
+        "plugins": []
     },
-    "collections" : {
-
-    },
-    "triggers" : {
-
-    },
-    "actions" : {
-        "snmp" : {
-            "display_name" : "snmp",
-            "className" : "_snmp",
-            "class_location" : "models.action",
-            "description" : "Execute one or multiple SNMP queries against one or multiple targets",
-            "fields" : [
-                { "schema_item" : "snmp_user", "schema_value" : "snmp_user", "type" : "input", "label" : "snmp user", "description" : "The user to authenticate with", "required" : true, "jimi_syntax" : false },
-                { "schema_item" : "auth_type", "schema_value" : "auth_type", "type" : "input", "label" : "authentication type", "description" : "The type of SNMP authentication to use", "required" : true, "jimi_syntax" : false },
-                { "schema_item" : "auth_pass", "schema_value" : "auth_pass", "type" : "input", "label" : "authentication password", "description" : "The authentication password", "required" : true, "jimi_syntax" : false },
-                { "schema_item" : "enc_type", "schema_value" : "enc_type", "type" : "input", "label" : "encryption type", "description" : "The type of SNMP encryption to use", "required" : true, "jimi_syntax" : false },
-                { "schema_item" : "enc_pass", "schema_value" : "enc_pass", "type" : "input", "label" : "encryption password", "description" : "The encryption password", "required" : true, "jimi_syntax" : false },
-                { "schema_item" : "host", "schema_value" : "host", "type" : "input", "label" : "host", "description" : "The target host", "required" : false, "jimi_syntax" : false },
-                { "schema_item" : "manual_hosts", "schema_value" : "manual_hosts", "type" : "input", "label" : "manual hosts", "description" : "The target hosts, in list form", "required" : false, "jimi_syntax" : false },
-                { "schema_item" : "oids", "schema_value" : "oids", "type" : "json-input", "label" : "oids", "description" : "Which OIDs to query the target", "required" : true, "jimi_syntax" : false },
-                { "schema_item" : "multiple_values", "schema_value" : "multiple_values", "type" : "checkbox", "label" : "returns multiple", "description" : "Whether the query returns multiple values for each OID or not", "required" : false, "jimi_syntax" : false }
+    "collections": {},
+    "triggers": {},
+    "actions": {
+        "snmp": {
+            "display_name": "batfish_route",
+            "className": "_batfish_route",
+            "class_location": "models.action",
+            "description": "Batfish Routing Questions",
+            "fields": [
+                {
+                    "schema_item": "src_ip",
+                    "schema_value": "src_ip",
+                    "type": "input",
+                    "label": "Source IP Address / Source Network",
+                    "description": "Source IP or Network to be queried",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "dst_ip",
+                    "schema_value": "dst_ip",
+                    "type": "input",
+                    "label": "Destination IP address / Destination Network",
+                    "description": "Destination IP or Network to be queried",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "dst_port",
+                    "schema_value": "dst_port",
+                    "type": "input",
+                    "label": "Destination Port / Destination App / Destination Service",
+                    "description": "Destination Port / Destination Application",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "BATFISH_SERVER",
+                    "schema_value": "BATFISH_SERVER",
+                    "type": "input",
+                    "label": "Batfish Server IP",
+                    "description": "Batfish Server IP",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "NETWORK_NAME",
+                    "schema_value": "NETWORK_NAME",
+                    "type": "input",
+                    "label": "Batfish Network Snapshot Name",
+                    "description": "Arbitrary name for the Network snapshots/configs",
+                    "required": false,
+                    "jimi_syntax": false
+                }
             ],
-            "data_out" : {
-                "result" : { 
-                    "description" : "Determines if the given action was successful.",
-                    "type" : "boolean",
-                    "always_present" : true,
-                    "values" : {
-                        "True" : { "description" : "Action completed successfully." },
-                        "False" : { "description" : "Action was unsuccessful." }
+            "data_out": {
+                "result": {
+                    "description": "Determines if the given action was successful.",
+                    "type": "boolean",
+                    "always_present": true,
+                    "values": {
+                        "True": {
+                            "description": "Action completed successfully."
+                        },
+                        "False": {
+                            "description": "Action was unsuccessful."
+                        }
                     }
                 },
-                "rc" : {
-                    "description" : "Returns the provided rc field value.",
-                    "type" : "number",
-                    "always_present" : true,
-                    "values" : {
-                        "(number)" : { "description" : "The integer provided within the rc field." }
+                "rc": {
+                    "description": "Returns the provided rc field value.",
+                    "type": "number",
+                    "always_present": true,
+                    "values": {
+                        "(number)": {
+                            "description": "The integer provided within the rc field."
+                        }
                     }
                 },
-                "data" : {
-                    "description" : "Outputs any returned data from the executed process",
-                    "type" : "text",
-                    "always_present" : false,
-                    "values" : {
-                        "(string)" : { "description" : "The returned data from the SNMP query" }
+                "data": {
+                    "description": "Outputs any returned data from the executed process",
+                    "type": "text",
+                    "always_present": false,
+                    "values": {
+                        "(string)": {
+                            "description": "The returned data from the routing query"
+                        }
                     }
                 }
             }
         }
     },
-    "settings" : {
-
-    }
+    "settings": {}
 }

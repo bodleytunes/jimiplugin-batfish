@@ -2,8 +2,10 @@
 ##### Requirements:
 
 * pybatfish python libraries
+* GitPython Python libraries (to be able to clone git repo where configs are located)
 
 `pip3 install pybatfish`
+`pip3 install GitPython`
 
 Requires running batfish server:
 This example uses batfish running in Docker
