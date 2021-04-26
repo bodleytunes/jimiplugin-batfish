@@ -1,0 +1,68 @@
+{
+    "name" : "snmp",
+    "author" : "biscuit-thief",
+    "version" : 1.2,
+    "categories" : ["networking"],
+    "description" : "Execute SNMP queries against targets",
+    "icon" : null,
+    "requirements" : {
+        "jimi_min_version" : null,
+        "jimi_max_version" : null,
+        "plugins" : []
+    },
+    "collections" : {
+
+    },
+    "triggers" : {
+
+    },
+    "actions" : {
+        "snmp" : {
+            "display_name" : "snmp",
+            "className" : "_snmp",
+            "class_location" : "models.action",
+            "description" : "Execute one or multiple SNMP queries against one or multiple targets",
+            "fields" : [
+                { "schema_item" : "snmp_user", "schema_value" : "snmp_user", "type" : "input", "label" : "snmp user", "description" : "The user to authenticate with", "required" : true, "jimi_syntax" : false },
+                { "schema_item" : "auth_type", "schema_value" : "auth_type", "type" : "input", "label" : "authentication type", "description" : "The type of SNMP authentication to use", "required" : true, "jimi_syntax" : false },
+                { "schema_item" : "auth_pass", "schema_value" : "auth_pass", "type" : "input", "label" : "authentication password", "description" : "The authentication password", "required" : true, "jimi_syntax" : false },
+                { "schema_item" : "enc_type", "schema_value" : "enc_type", "type" : "input", "label" : "encryption type", "description" : "The type of SNMP encryption to use", "required" : true, "jimi_syntax" : false },
+                { "schema_item" : "enc_pass", "schema_value" : "enc_pass", "type" : "input", "label" : "encryption password", "description" : "The encryption password", "required" : true, "jimi_syntax" : false },
+                { "schema_item" : "host", "schema_value" : "host", "type" : "input", "label" : "host", "description" : "The target host", "required" : false, "jimi_syntax" : false },
+                { "schema_item" : "manual_hosts", "schema_value" : "manual_hosts", "type" : "input", "label" : "manual hosts", "description" : "The target hosts, in list form", "required" : false, "jimi_syntax" : false },
+                { "schema_item" : "oids", "schema_value" : "oids", "type" : "json-input", "label" : "oids", "description" : "Which OIDs to query the target", "required" : true, "jimi_syntax" : false },
+                { "schema_item" : "multiple_values", "schema_value" : "multiple_values", "type" : "checkbox", "label" : "returns multiple", "description" : "Whether the query returns multiple values for each OID or not", "required" : false, "jimi_syntax" : false }
+            ],
+            "data_out" : {
+                "result" : { 
+                    "description" : "Determines if the given action was successful.",
+                    "type" : "boolean",
+                    "always_present" : true,
+                    "values" : {
+                        "True" : { "description" : "Action completed successfully." },
+                        "False" : { "description" : "Action was unsuccessful." }
+                    }
+                },
+                "rc" : {
+                    "description" : "Returns the provided rc field value.",
+                    "type" : "number",
+                    "always_present" : true,
+                    "values" : {
+                        "(number)" : { "description" : "The integer provided within the rc field." }
+                    }
+                },
+                "data" : {
+                    "description" : "Outputs any returned data from the executed process",
+                    "type" : "text",
+                    "always_present" : false,
+                    "values" : {
+                        "(string)" : { "description" : "The returned data from the SNMP query" }
+                    }
+                }
+            }
+        }
+    },
+    "settings" : {
+
+    }
+}
