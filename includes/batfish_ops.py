@@ -48,6 +48,24 @@ class batfish_ops:
                 .frame()
             )
 
+        traces = traceroutes.Traces.iloc
+        for t in traces:
+            # Destination Network
+
+            # Source device
+            print(f"Traffic sourced from:  {t[0].hops[0].node}")
+            # Egress interface
+            print(f" Next-hop (Egress) interface {t[0].hops[0].steps[3].detail}")
+            # Next-hop interface
+            print(
+                f"Next-hop IP:  {t[0].hops[0].steps[1].detail.routes[0]['nextHopIp']}"
+            )
+            # Next-hop protocol
+            print(
+                f"Protocol/route type: {t[0].hops[0].steps[1].detail.routes[0]['protocol']}"
+            )
+            # Is Permitted
+
         answer = traceroutes
 
         return answer

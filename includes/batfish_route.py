@@ -106,4 +106,4 @@ b = batfish_route(
 )
 b.get_configs()
 answers = b.get_data()
-print(answers)
+# print(answers)
