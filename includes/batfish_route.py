@@ -93,6 +93,8 @@ class batfish_route:
 SRC_IP = "10.1.255.100"
 DST_IP = "10.3.255.100"
 DST_PORT = "53"
+APPLICATIONS = ["dns", "ssh"]
+IP_PROTOCOLS = ["tcp", "udp"]
 
 b = batfish_route(
     src_ip=SRC_IP,
