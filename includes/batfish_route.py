@@ -62,9 +62,9 @@ class batfish_route:
 
     def get_data(self):
 
-        batfish_routes = self.return_routes()
+        answers = self.return_routes()
 
-        return batfish_routes
+        return answers
 
     def return_routes(self) -> dict:
 
@@ -76,7 +76,7 @@ class batfish_route:
 
         # return routing results
 
-        return batfish_routes
+        return answers
 
     def validate_net(self, net) -> str:
         # Validate networks/ip's
@@ -105,4 +105,5 @@ b = batfish_route(
     BATFISH_SERVER=None,
 )
 b.get_configs()
-b.get_data()
+answers = b.get_data()
+print(answers)
