@@ -1,17 +1,12 @@
 import os
-from batfish_ops import batfish_ops
+from batfish_ops import BatfishOps
 
-# from pybatfish.client.commands import bf_session, bf_init_snapshot, bf_set_network
-# from pybatfish.question import bfq
-# from pybatfish.question.question import load_questions
-# from pybatfish.datamodel.flow import HeaderConstraints
-#
 from git import Repo
 from git import GitCommandError
 import git
 
 
-class batfish_route:
+class batfish:
     def __init__(
         self,
         src_ip: str,
@@ -37,28 +32,32 @@ class batfish_route:
         self.dest_dir = str()
         self.snapshots_dir = os.path.join(self.ROOT_DIR, "snapshots")
 
+        self.git_url = "http://10.12.10.4:3000/jon/forti-configs.git"
+
     def get_configs(self):
         # git checkout config location to ./snapshots/configs
         device_type = self.device_type
 
         if device_type == "FIREWALL":
-
-            git_url = "http://10.12.10.4:3000/jon/forti-configs.git"
-            self.dest_dir = os.path.join(self.ROOT_DIR, "snapshots/configs")
-
-            repo = git.Repo(self.dest_dir)
-            try:
-                # initially try a clone
-                cloned_repo = Repo.clone_from(git_url, self.dest_dir)
-            except GitCommandError:
-                # if that fails, do a git pull
-                origin = repo.remotes.origin
-                origin.pull()
+            self.get_git_configs()
 
         elif device_type == "ROUTER":
             # do as above but get router configs
             # TODO: GET ROUTER
             print("get router")
+
+    def get_git_configs(self):
+
+        self.dest_dir = os.path.join(self.ROOT_DIR, "snapshots/configs")
+
+        repo = git.Repo(self.dest_dir)
+        try:
+            # initially try a clone
+            cloned_repo = Repo.clone_from(self.git_url, self.dest_dir)
+        except GitCommandError:
+            # if that fails, do a git pull
+            origin = repo.remotes.origin
+            origin.pull()
 
     def get_data(self):
 
@@ -71,7 +70,7 @@ class batfish_route:
         batfish_routes = {}
 
         # TODO - batfish queries
-        bat_ops = batfish_ops(SNAPSHOT_PATH=self.snapshots_dir)
+        bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
         answers = bat_ops.question_routing(self.src_ip, self.dst_ip, self.dst_port)
 
         # return routing results
@@ -91,12 +90,13 @@ class batfish_route:
 
 
 SRC_IP = "10.1.255.100"
-DST_IP = "10.3.255.100"
+# DST_IP = "10.3.255.100"
+DST_IP = "8.8.8.8"
 DST_PORT = "53"
 APPLICATIONS = ["dns", "ssh"]
 IP_PROTOCOLS = ["tcp", "udp"]
 
-b = batfish_route(
+b = batfish(
     src_ip=SRC_IP,
     dst_ip=DST_IP,
     dst_port=DST_PORT,
