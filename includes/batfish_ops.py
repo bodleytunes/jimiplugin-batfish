@@ -76,36 +76,42 @@ class BatfishOps:
             # Source device
             # print(f"Traffic sourced from:  {t.Traces.iloc[0].hops[0].node}")
             print(f"Traffic sourced from:  {t.Traces.values[0][0].hops[0].node}")
+            print("---------------------------------------------------------------")
+            print(f"Traffic Destination: {dst_ip}")
+            print("---------------------------------------------------------------")
+
             # Egress interface
             # print(
             #    f"Next-hop (Egress) interface: {t.Traces.iloc[0].hops[0].steps[3].detail}"
             # )
-            print(
-                f"Next-hop (Egress) interface: {t.Traces.values[0][0].hops[0].steps[3].detail}"
-            )
+            # print(
+            #    f"Next-hop (Egress) interface: {t.Traces.values[0][0].hops[0].steps[3].detail}"
+            # )
             # Loop through egress ifaces
             for hop in t.Traces.values[0]:
-                print(hop.hops[0].steps[3].detail)
+                print(f"Next-hop (Egress) interface: {hop.hops[0].steps[3].detail}")
             # Next-hop interface
             # print(
             #    f"Next-hop IP:  {t.Traces.iloc[0].hops[0].steps[1].detail.routes[0]['nextHopIp']}"
             # )
             # Print ECMP next-hop #1
-            print(
-                f"Next-hop IP:  {t.Traces.values[0][0].hops[0].steps[1].detail.routes[0]['nextHopIp']}"
-            )
-            # Print ECMP next-hop #2
-            print(
-                f"Next-hop IP:  {t.Traces.values[0][1].hops[0].steps[1].detail.routes[0]['nextHopIp']}"
-            )
+            # print(
+            #    f"Next-hop IP:  {t.Traces.values[0][0].hops[0].steps[1].detail.routes[0]['nextHopIp']}"
+            # )
+            ## Print ECMP next-hop #2
+            # print(
+            #    f"Next-hop IP:  {t.Traces.values[0][1].hops[0].steps[1].detail.routes[0]['nextHopIp']}"
+            # )
             # Loop through ECMP hops
             for hop in t.Traces.values[0]:
-                print(hop.hops[0].steps[1].detail.routes[0]["nextHopIp"])
+                print(
+                    f"Next-hop IP:  {hop.hops[0].steps[1].detail.routes[0]['nextHopIp']}"
+                )
 
             # Next-hop protocol
-            print(
-                f"Protocol/route type: {t.Traces.values[0][0].hops[0].steps[1].detail.routes[0]['protocol']}"
-            )
+            # print(
+            #    f"Protocol/route type: {t.Traces.values[0][0].hops[0].steps[1].detail.routes[0]['protocol']}"
+            # )
             # Loop through protocols
             for hop in t.Traces.values[0]:
                 print(
