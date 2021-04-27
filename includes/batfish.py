@@ -1,4 +1,6 @@
 import os
+
+
 from batfish_ops import BatfishOps
 
 from git import Repo
@@ -59,21 +61,30 @@ class batfish:
             origin = repo.remotes.origin
             origin.pull()
 
-    def get_data(self):
+    def get_data_traceroutes(self):
+        answers_tr = self.return_traceroutes()
+        return answers_tr
 
-        answers = self.return_routes()
+    def get_data_longest_match(self):
+        answers_lm = self.return_longest_match()
+        return answers_lm
 
-        return answers
-
-    def return_routes(self) -> dict:
-
-        batfish_routes = {}
+    def return_traceroutes(self) -> dict:
 
         # TODO - batfish queries
         bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
         answers = bat_ops.question_routing(self.src_ip, self.dst_ip, self.dst_port)
 
-        # return routing results
+        # return traceroutes results
+
+        return answers
+
+    def return_longest_match(self) -> dict:
+
+        bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
+        answers = bat_ops.question_routing_lm(self.src_ip, self.dst_ip)
+
+        # return longest match results
 
         return answers
 
@@ -87,23 +98,3 @@ class batfish:
         # Validate ports
         # TODO - validate inputs
         return port
-
-
-SRC_IP = "10.1.255.100"
-# DST_IP = "10.3.255.100"
-DST_IP = "8.8.8.8"
-DST_PORT = "53"
-APPLICATIONS = ["dns", "ssh"]
-IP_PROTOCOLS = ["tcp", "udp"]
-
-b = batfish(
-    src_ip=SRC_IP,
-    dst_ip=DST_IP,
-    dst_port=DST_PORT,
-    device_type=None,
-    BATFISH_NETWORK=None,
-    BATFISH_SERVER=None,
-)
-b.get_configs()
-answers = b.get_data()
-# print(answers)

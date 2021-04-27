@@ -71,6 +71,25 @@ class BatfishOps:
 
         return answer
 
+    def question_routing_lm(self, src_ip, dst_ip):
+
+        # Get a list of all the nodes/devices in question
+        node_list = self.get_all_devices()
+
+        answers_list = []
+        answers_dict = {}
+
+        longest_match = bfq.lpmRoutes(ip=dst_ip).answer().frame()
+        for n in node_list:
+            longest_match = bfq.lpmRoutes(ip=dst_ip).answer().frame()
+
+        # Create new dictionary with keys for each of the nodes and zipped values that we are interested in.
+        answers_dict = dict(
+            zip(node_list, (zip(longest_match.Ip, longest_match.Network)))
+        )
+
+        return answers_dict
+
     def get_all_devices(self) -> list:
         nodes = bfq.nodeProperties().answer().frame()
 
