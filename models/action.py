@@ -30,12 +30,11 @@ class _batfish(action._action):
             src_ip, dst_ip, dst_port, BATFISH_SERVER, BATFISH_NETWORK, device_type
         )
 
-        data = b.get_data_traceroutes
+        data = b.get_data_traceroutes()
         # data = list([b.get_data_traceroutes(), b.get_data_longest_match])
 
-        # batfish_routes = "test message"
         # Return results
-        if len(data) is not None:
+        if len(data) > 0:
             return {"result": True, "rc": 0, "data": data}
         else:
             return {"result": False, "rc": 404}
