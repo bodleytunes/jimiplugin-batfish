@@ -27,7 +27,9 @@ class BatfishOps:
         # Load Batfish Questions
         load_questions()
 
-    def question_routing(self, src_ip, dst_ip, dst_port=None, applications=None):
+    def question_routing_traceroute(
+        self, src_ip, dst_ip, dst_port=None, applications=None
+    ):
 
         # Get a list of all the nodes/devices
         node_list = self.get_all_devices()
@@ -39,17 +41,8 @@ class BatfishOps:
             print("hello world")
 
         elif dst_port is not None:
-            # todo - lookup startLocation based on ip address matching to node
 
-            # todo - enter ports as args
-            # traceroute_spoke1 = (
-            #    bfq.traceroute(
-            #        startLocation="fortigate-vm64-kvm__configs__spoke1.cfg",
-            #        headers=HeaderConstraints(dstIps=dst_ip, dstPorts=dst_port_list),
-            #    )
-            #    .answer()
-            #    .frame()
-            # )
+            # todo - lookup startLocation based on ip address matching to node
 
             traceroutes = []
 
@@ -76,7 +69,6 @@ class BatfishOps:
         # Get a list of all the nodes/devices in question
         node_list = self.get_all_devices()
 
-        answers_list = []
         answers_dict = {}
 
         longest_match = bfq.lpmRoutes(ip=dst_ip).answer().frame()

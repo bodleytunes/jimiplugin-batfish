@@ -1,7 +1,7 @@
 import os
 
 
-from batfish_ops import BatfishOps
+from plugins.batfish.includes import BatfishOps
 
 from git import Repo
 from git import GitCommandError
@@ -36,17 +36,24 @@ class batfish:
 
         self.git_url = "http://10.12.10.4:3000/jon/forti-configs.git"
 
+        ## init
+        self.get_configs()
+
     def get_configs(self):
         # git checkout config location to ./snapshots/configs
         device_type = self.device_type
 
-        if device_type == "FIREWALL":
+        if device_type.upper() == "FIREWALL":
             self.get_git_configs()
 
-        elif device_type == "ROUTER":
+        elif device_type.upper() == "ROUTER":
             # do as above but get router configs
             # TODO: GET ROUTER
             print("get router")
+        elif device_type.upper() == "IPTABLES":
+            # do as above but get router configs
+            # TODO: GET SERVER
+            print("get server")
 
     def get_git_configs(self):
 
@@ -55,8 +62,9 @@ class batfish:
         repo = git.Repo(self.dest_dir)
         try:
             # initially try a clone
-            cloned_repo = Repo.clone_from(self.git_url, self.dest_dir)
-        except GitCommandError:
+            # cloned_repo = Repo.clone_from(self.git_url, self.dest_dir)
+            print("nothing")
+        except Exception:
             # if that fails, do a git pull
             origin = repo.remotes.origin
             origin.pull()
@@ -71,9 +79,11 @@ class batfish:
 
     def return_traceroutes(self) -> dict:
 
-        # TODO - batfish queries
+        # batfish queries
         bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
-        answers = bat_ops.question_routing(self.src_ip, self.dst_ip, self.dst_port)
+        answers = bat_ops.question_routing_traceroute(
+            self.src_ip, self.dst_ip, self.dst_port
+        )
 
         # return traceroutes results
 

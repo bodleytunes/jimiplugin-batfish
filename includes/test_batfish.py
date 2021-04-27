@@ -64,6 +64,7 @@ def test_print_results_tr(answers_tr):
         #    f"Protocol/route type: {t.Traces.values[0][0].hops[0].steps[1].detail.routes[0]['protocol']}"
         # )
         # Loop through protocols
+
         for hop in t.Traces.values[0]:
             if hop.hops[0].steps[1].detail.routes[0]["protocol"].lower() == "connected":
                 print(
@@ -77,21 +78,13 @@ def test_print_results_tr(answers_tr):
         # Is Permitted
 
 
+# todo - the below is bust/broken - needs a rewrite
 def test_print_results_lm(answers_lm):
-    print(answers_lm)
+    # print(answers_lm)
     for key, value in answers_lm.items():
         print(f"Node: {key}")
         print(f"  Dst Network: {value[0]}")
         print(f"  Longest Match: {value[1]}")
-        # check connected
-        # net_match = IPNetwork(value[1])
-        # dst_net = IPNetwork(value[0])
-        # print(net_match, dst_net)
-        # print(net_match.network, dst_net.network)
-        # if dst_net in IPNetwork(value[1]):
-        #     print("True")
-        # else:
-        #     print("False :( ")
 
 
 test_print_results_tr(answers_tr)

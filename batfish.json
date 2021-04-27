@@ -1,9 +1,11 @@
 {
-    "name": "batfish_route",
+    "name": "batfish",
     "author": "jmc",
     "version": 1.0,
     "categories": [
-        "networking"
+        "networking",
+        "firewalls",
+        "routing"
     ],
     "description": "Run api commands against a Batfish service to precalculate and validate routing policy and firewall rules",
     "icon": null,
@@ -15,9 +17,9 @@
     "collections": {},
     "triggers": {},
     "actions": {
-        "snmp": {
-            "display_name": "batfish_route",
-            "className": "_batfish_route",
+        "batfish": {
+            "display_name": "batfish",
+            "className": "_batfish",
             "class_location": "models.action",
             "description": "Batfish Routing Questions",
             "fields": [
@@ -58,11 +60,20 @@
                     "jimi_syntax": false
                 },
                 {
-                    "schema_item": "NETWORK_NAME",
-                    "schema_value": "NETWORK_NAME",
+                    "schema_item": "BATFISH_NETWORK",
+                    "schema_value": "BATFISH_NETWORK",
                     "type": "input",
                     "label": "Batfish Network Snapshot Name",
                     "description": "Arbitrary name for the Network snapshots/configs",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "device_type",
+                    "schema_value": "device_type",
+                    "type": "input",
+                    "label": "Device Type",
+                    "description": "FIREWALL, ROUTER, IPTABLES",
                     "required": false,
                     "jimi_syntax": false
                 }
