@@ -1,10 +1,11 @@
+from plugins.batfish.includes.batfish import batfish
 from pybatfish.client.commands import bf_session, bf_init_snapshot, bf_set_network
 from pybatfish.question import bfq
 from pybatfish.question.question import load_questions
 from pybatfish.datamodel.flow import HeaderConstraints
 
 
-class BatfishOps:
+class BatfishOps(batfish):
     def __init__(
         self, NETWORK_NAME=None, BATFISH_SERVER=None, SNAPSHOT_PATH=None
     ) -> None:
@@ -72,8 +73,8 @@ class BatfishOps:
         answers_dict = {}
 
         longest_match = bfq.lpmRoutes(ip=dst_ip).answer().frame()
-        for n in node_list:
-            longest_match = bfq.lpmRoutes(ip=dst_ip).answer().frame()
+        # for n in node_list:
+        #    longest_match = bfq.lpmRoutes(ip=dst_ip).answer().frame()
 
         # Create new dictionary with keys for each of the nodes and zipped values that we are interested in.
         answers_dict = dict(
@@ -88,7 +89,6 @@ class BatfishOps:
         node_list = []
         # Get Node Strings
         for node in nodes["Node"].iloc:
-            print(node)
             node_list.append(node)
 
         return node_list

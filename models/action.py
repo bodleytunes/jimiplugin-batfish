@@ -11,8 +11,8 @@ class _batfish(action._action):
     src_ip = str()
     dst_ip = str()
     dst_port = str()
-    BATFISH_SERVER = str()
-    BATFISH_NETWORK = str()
+    batfish_server = str()
+    batfish_network = str()
     device_type = str()
 
     def doAction(self, data) -> dict:
@@ -21,19 +21,19 @@ class _batfish(action._action):
         src_ip = helpers.evalString(self.src_ip, {"data": data["flowData"]})
         dst_ip = helpers.evalString(self.dst_ip, {"data": data["flowData"]})
         dst_port = helpers.evalString(self.dst_port, {"data": data["flowData"]})
-        BATFISH_SERVER = helpers.evalString(self.src_ip, {"data": data["flowData"]})
-        BATFISH_NETWORK = helpers.evalString(self.dst_ip, {"data": data["flowData"]})
+        batfish_server = helpers.evalString(self.src_ip, {"data": data["flowData"]})
+        batfish_network = helpers.evalString(self.dst_ip, {"data": data["flowData"]})
         device_type = helpers.evalString(self.dst_port, {"data": data["flowData"]})
 
         # Call Batfish Includes
         b = batfish.batfish(
-            src_ip, dst_ip, dst_port, BATFISH_SERVER, BATFISH_NETWORK, device_type
+            src_ip, dst_ip, dst_port, batfish_server, batfish_network, device_type
         )
 
-        data = b.get_data_traceroutes()
-        # data = list([b.get_data_traceroutes(), b.get_data_longest_match])
+        # Get batfish data
+        data = list([b.return_traceroutes(), b.return_longest_match()])
 
-        # Return results
+        # Return results to Jimi flow
         if len(data) > 0:
             return {"result": True, "rc": 0, "data": data}
         else:

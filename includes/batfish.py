@@ -67,22 +67,13 @@ class batfish:
         repo = git.Repo(self.dest_dir)
         try:
             # initially try a clone
-            # cloned_repo = Repo.clone_from(self.git_url, self.dest_dir)
-            print("nothing")
+            cloned_repo = Repo.clone_from(self.git_url, self.dest_dir)
         except Exception:
             # if that fails, do a git pull
             origin = repo.remotes.origin
             origin.pull()
 
-    def get_data_traceroutes(self):
-        answers_tr = self.return_traceroutes()
-        return answers_tr
-
-    def get_data_longest_match(self):
-        answers_lm = self.return_longest_match()
-        return answers_lm
-
-    def return_traceroutes(self) -> dict:
+    def return_traceroutes(self):
 
         # batfish queries
         bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
@@ -94,7 +85,7 @@ class batfish:
 
         return answers
 
-    def return_longest_match(self) -> dict:
+    def return_longest_match(self):
 
         bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
         answers = bat_ops.question_routing_lm(self.src_ip, self.dst_ip)
