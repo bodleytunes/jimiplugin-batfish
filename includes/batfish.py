@@ -20,8 +20,8 @@ class batfish:
         dst_ip: str,
         dst_port: int,
         device_type: str,
-        BATFISH_SERVER: str,
-        BATFISH_NETWORK: str,
+        batfish_server: str,
+        batfish_network: str,
     ) -> None:
 
         self.ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -30,8 +30,8 @@ class batfish:
         self.dst_ip = dst_ip
         self.dst_port = dst_port
 
-        self.batfish_server = BATFISH_SERVER
-        self.batfish_network = BATFISH_NETWORK
+        self.batfish_server = batfish_server
+        self.batfish_network = batfish_network
 
         # self.device_type = device_type
         self.device_type = "FIREWALL"
@@ -81,8 +81,6 @@ class batfish:
             self.src_ip, self.dst_ip, self.dst_port
         )
 
-        # return traceroutes results
-
         return answers
 
     def return_longest_match(self):
@@ -90,7 +88,6 @@ class batfish:
         bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
         answers = bat_ops.question_routing_lm(self.src_ip, self.dst_ip)
 
-        # return longest match results
 
         return answers
 

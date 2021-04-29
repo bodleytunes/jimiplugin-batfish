@@ -21,9 +21,9 @@ class _batfish(action._action):
         src_ip = helpers.evalString(self.src_ip, {"data": data["flowData"]})
         dst_ip = helpers.evalString(self.dst_ip, {"data": data["flowData"]})
         dst_port = helpers.evalString(self.dst_port, {"data": data["flowData"]})
-        batfish_server = helpers.evalString(self.src_ip, {"data": data["flowData"]})
-        batfish_network = helpers.evalString(self.dst_ip, {"data": data["flowData"]})
-        device_type = helpers.evalString(self.dst_port, {"data": data["flowData"]})
+        batfish_server = helpers.evalString(self.batfish_server, {"data": data["flowData"]})
+        batfish_network = helpers.evalString(self.batfish_network, {"data": data["flowData"]})
+        device_type = helpers.evalString(self.device_type, {"data": data["flowData"]})
 
         # Call Batfish Includes
         b = batfish.batfish(
