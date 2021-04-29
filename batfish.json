@@ -51,8 +51,8 @@
                     "jimi_syntax": false
                 },
                 {
-                    "schema_item": "BATFISH_SERVER",
-                    "schema_value": "BATFISH_SERVER",
+                    "schema_item": "batfish_server",
+                    "schema_value": "batfish_server",
                     "type": "input",
                     "label": "Batfish Server IP",
                     "description": "Batfish Server IP",
@@ -60,8 +60,8 @@
                     "jimi_syntax": false
                 },
                 {
-                    "schema_item": "BATFISH_NETWORK",
-                    "schema_value": "BATFISH_NETWORK",
+                    "schema_item": "batfish_network",
+                    "schema_value": "batfish_network",
                     "type": "input",
                     "label": "Batfish Network Snapshot Name",
                     "description": "Arbitrary name for the Network snapshots/configs",

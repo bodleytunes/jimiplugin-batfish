@@ -5,6 +5,7 @@
 * GitPython Python libraries (to be able to clone git repo where configs are located)
 
 `pip3 install pybatfish`
+
 `pip3 install GitPython`
 
 Requires running batfish server:
