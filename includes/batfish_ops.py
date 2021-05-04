@@ -25,6 +25,9 @@ class BatfishOps(batfish):
         # Initialize Batfish Snapshot
         bf_init_snapshot(self.SNAPSHOT_PATH, name=self.NETWORK_NAME, overwrite=True)
 
+        # generate dataplane
+        #bf_generate_dataplane()
+
         # Load Batfish Questions
         load_questions()
 

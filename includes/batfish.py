@@ -22,6 +22,7 @@ class batfish:
         device_type: str,
         batfish_server: str,
         batfish_network: str,
+        snapshots_dir=None
     ) -> None:
 
         self.ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -37,41 +38,42 @@ class batfish:
         self.device_type = "FIREWALL"
 
         self.dest_dir = str()
-        self.snapshots_dir = os.path.join(self.ROOT_DIR, "snapshots")
+        #self.snapshots_dir = os.path.join(self.ROOT_DIR, "snapshots")
+        self.snapshots_dir = "/shared/data/storage/firewall-configs/snapshots"
 
-        self.git_url = "http://10.12.10.4:3000/jon/forti-configs.git"
+        #self.git_url = "http://10.12.10.4:3000/jon/forti-configs.git"
 
         ## init
-        self.get_configs()
+        #self.get_configs()
 
-    def get_configs(self):
-        # git checkout config location to ./snapshots/configs
-        device_type = self.device_type
-
-        if device_type.upper() == "FIREWALL":
-            self.get_git_configs()
-
-        elif device_type.upper() == "ROUTER":
-            # do as above but get router configs
-            # TODO: GET ROUTER
-            print("get router")
-        elif device_type.upper() == "IPTABLES":
-            # do as above but get server iptables configs
-            # TODO: GET SERVER
-            print("get server")
-
-    def get_git_configs(self):
-
-        self.dest_dir = os.path.join(self.ROOT_DIR, "snapshots/configs")
-
-        repo = git.Repo(self.dest_dir)
-        try:
-            # initially try a clone
-            cloned_repo = Repo.clone_from(self.git_url, self.dest_dir)
-        except Exception:
-            # if that fails, do a git pull
-            origin = repo.remotes.origin
-            origin.pull()
+    #def get_configs(self):
+    #    # git checkout config location to ./snapshots/configs
+    #    device_type = self.device_type
+#
+    #    if device_type.upper() == "FIREWALL":
+    #        self.get_git_configs()
+#
+    #    elif device_type.upper() == "ROUTER":
+    #        # do as above but get router configs
+    #        # TODO: GET ROUTER
+    #        print("get router")
+    #    elif device_type.upper() == "IPTABLES":
+    #        # do as above but get server iptables configs
+    #        # TODO: GET SERVER
+    #        print("get server")
+#
+    #def get_git_configs(self):
+#
+    #    self.dest_dir = os.path.join(self.ROOT_DIR, "snapshots/configs")
+#
+    #    repo = git.Repo(self.dest_dir)
+    #    try:
+    #        # initially try a clone
+    #        cloned_repo = Repo.clone_from(self.git_url, self.dest_dir)
+    #    except Exception:
+    #        # if that fails, do a git pull
+    #        origin = repo.remotes.origin
+    #        origin.pull()
 
     def return_traceroutes(self):
 

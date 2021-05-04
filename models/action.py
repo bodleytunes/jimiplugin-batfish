@@ -14,6 +14,7 @@ class _batfish(action._action):
     batfish_server = str()
     batfish_network = str()
     device_type = str()
+    snapshots_dir = str()
 
     def doAction(self, data) -> dict:
 
@@ -24,10 +25,12 @@ class _batfish(action._action):
         batfish_server = helpers.evalString(self.batfish_server, {"data": data["flowData"]})
         batfish_network = helpers.evalString(self.batfish_network, {"data": data["flowData"]})
         device_type = helpers.evalString(self.device_type, {"data": data["flowData"]})
+        snapshots_dir = helpers.evalString(self.snapshots_dir, {"data": data["flowData"]})
+
 
         # Call Batfish Includes
         b = batfish.batfish(
-            src_ip, dst_ip, dst_port, batfish_server, batfish_network, device_type
+            src_ip, dst_ip, dst_port, batfish_server, batfish_network, device_type, snapshots_dir=snapshots_dir
         )
 
         # Get batfish data

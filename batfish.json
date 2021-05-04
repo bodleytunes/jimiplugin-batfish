@@ -60,6 +60,15 @@
                     "jimi_syntax": false
                 },
                 {
+                    "schema_item": "snapshots_dir",
+                    "schema_value": "snapshots_dir",
+                    "type": "input",
+                    "label": "snapshots / network configs dir",
+                    "description": "Directory where the network configs are saved to",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
                     "schema_item": "batfish_network",
                     "schema_value": "batfish_network",
                     "type": "input",
