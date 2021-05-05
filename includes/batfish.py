@@ -39,41 +39,8 @@ class batfish:
 
         self.dest_dir = str()
         #self.snapshots_dir = os.path.join(self.ROOT_DIR, "snapshots")
-        self.snapshots_dir = "/shared/data/storage/firewall-configs/snapshots"
+        self.snapshots_dir = "/shared/data/storage/firewall-configs/snapshot"
 
-        #self.git_url = "http://10.12.10.4:3000/jon/forti-configs.git"
-
-        ## init
-        #self.get_configs()
-
-    #def get_configs(self):
-    #    # git checkout config location to ./snapshots/configs
-    #    device_type = self.device_type
-#
-    #    if device_type.upper() == "FIREWALL":
-    #        self.get_git_configs()
-#
-    #    elif device_type.upper() == "ROUTER":
-    #        # do as above but get router configs
-    #        # TODO: GET ROUTER
-    #        print("get router")
-    #    elif device_type.upper() == "IPTABLES":
-    #        # do as above but get server iptables configs
-    #        # TODO: GET SERVER
-    #        print("get server")
-#
-    #def get_git_configs(self):
-#
-    #    self.dest_dir = os.path.join(self.ROOT_DIR, "snapshots/configs")
-#
-    #    repo = git.Repo(self.dest_dir)
-    #    try:
-    #        # initially try a clone
-    #        cloned_repo = Repo.clone_from(self.git_url, self.dest_dir)
-    #    except Exception:
-    #        # if that fails, do a git pull
-    #        origin = repo.remotes.origin
-    #        origin.pull()
 
     def return_traceroutes(self):
 
@@ -90,19 +57,8 @@ class batfish:
         bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
         answers = bat_ops.question_routing_lm(self.src_ip, self.dst_ip)
 
-
         return answers
 
-    def validate_net(self, net) -> str:
-        # Validate networks/ip's
-        # TODO - validate inputs
-
-        return net
-
-    def validate_port(self, port) -> int:
-        # Validate ports
-        # TODO - validate inputs
-        return port
 
 
 class BatfishOps:
@@ -137,15 +93,20 @@ class BatfishOps:
 
         dst_port_list = list([dst_port])
 
-        if applications is not None:
-            # todo - enter application as args
-            print("hello world")
+        if dst_port is not None:
 
-        elif dst_port is not None:
 
-            # todo - lookup startLocation based on ip address matching to node
+            properties = bfq.nodeProperties().answer().frame()
+            print(properties)
 
             traceroutes = []
+
+            ip_owners = bfq.ipOwners().answer().frame()
+            print(ip_owners)
+
+            #t = bfq.traceroute(startLocation="fortigate-vm64-kvm", headers=HeaderConstraints(dstIps=dst_ip, dstPorts=dst_port_list)).answer().frame()
+
+
 
             for device in node_list:
 

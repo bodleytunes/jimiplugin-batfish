@@ -3,8 +3,8 @@ from netaddr import IPNetwork
 from batfish import batfish
 
 SRC_IP = "10.1.255.100"
-DST_IP = "10.3.255.100"
-# DST_IP = "8.8.8.8"
+#DST_IP = "10.3.255.100"
+DST_IP = "8.8.8.8"
 DST_PORT = "53"
 APPLICATIONS = ["dns", "ssh"]
 IP_PROTOCOLS = ["tcp", "udp"]
@@ -14,12 +14,12 @@ b = batfish(
     dst_ip=DST_IP,
     dst_port=DST_PORT,
     device_type=None,
-    BATFISH_NETWORK=None,
-    BATFISH_SERVER=None,
+    batfish_network=None,
+    batfish_server=None,
 )
-b.get_configs()
-answers_tr = b.get_data_traceroutes()
-answers_lm = b.get_data_longest_match()
+#b.get_configs()
+answers_tr = b.return_traceroutes()
+answers_lm = b.return_longest_match()
 
 
 def test_print_results_tr(answers_tr):
@@ -43,7 +43,7 @@ def test_print_results_tr(answers_tr):
         # )
         # Loop through egress ifaces
         for hop in t.Traces.values[0]:
-            print(f"Next-hop (Egress) interface: {hop.hops[0].steps[3].detail}")
+            print(f"Next-hop (Egress) interface: {hop.hops[0]}")
         # Next-hop interface
         # print(
         #    f"Next-hop IP:  {t.Traces.iloc[0].hops[0].steps[1].detail.routes[0]['nextHopIp']}"
@@ -58,7 +58,7 @@ def test_print_results_tr(answers_tr):
         # )
         # Loop through ECMP hops
         for hop in t.Traces.values[0]:
-            print(f"Next-hop IP:  {hop.hops[0].steps[1].detail.routes[0]['nextHopIp']}")
+            print(f"Next-hop IP:  {hop.hops[0].steps[0].detail}")
         # Next-hop protocol
         # print(
         #    f"Protocol/route type: {t.Traces.values[0][0].hops[0].steps[1].detail.routes[0]['protocol']}"

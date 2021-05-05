@@ -9,7 +9,7 @@ class BatfishOps(batfish):
     def __init__(
         self, NETWORK_NAME=None, BATFISH_SERVER=None, SNAPSHOT_PATH=None
     ) -> None:
-        self.NETWORK_NAME = "Firewalls"
+        self.NETWORK_NAME = "firewall_infra"
         self.BATFISH_SERVER = "10.12.12.134"
         self.SNAPSHOT_PATH = SNAPSHOT_PATH
 
@@ -40,14 +40,10 @@ class BatfishOps(batfish):
 
         dst_port_list = list([dst_port])
 
-        if applications is not None:
-            # todo - enter application as args
-            print("hello world")
+        if dst_port is not None:
 
-        elif dst_port is not None:
-
-            # todo - lookup startLocation based on ip address matching to node
-
+            
+            t = bfq.traceroute(startLocation='@enter(hub1[port2]', headers=HeaderConstraints(dstIps=dst_ip, dstPorts=dst_port_list)).answer().frame()
             traceroutes = []
 
             for device in node_list:
