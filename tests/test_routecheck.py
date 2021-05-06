@@ -11,7 +11,6 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 # end fudge python path
 
-
 from plugins.batfish.includes.route_check import RouteCheck
 
 start_node = "spoke1"
