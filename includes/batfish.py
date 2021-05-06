@@ -8,12 +8,8 @@ from pybatfish.question import bfq
 from pybatfish.question.question import load_questions
 from pybatfish.datamodel.flow import HeaderConstraints
 
-from git import Repo
-from git import GitCommandError
-import git
 
-
-class batfish:
+class BatFish:
     def __init__(
         self,
         src_ip: str,
@@ -40,6 +36,7 @@ class batfish:
         self.dest_dir = str()
         #self.snapshots_dir = os.path.join(self.ROOT_DIR, "snapshots")
         self.snapshots_dir = "/shared/data/storage/firewall-configs/snapshot"
+
 
 
     def return_traceroutes(self):
@@ -69,9 +66,11 @@ class BatfishOps:
         self.BATFISH_SERVER = "10.12.12.134"
         self.SNAPSHOT_PATH = SNAPSHOT_PATH
 
-        self.init_batfish()
+        #self.init_batfish()
 
-    def init_batfish(self):
+        
+
+    def init_batfish(self, BATFISH_SERVER=None, SNAPSHOT_PATH=None):
 
         bf_session.host = self.BATFISH_SERVER
         bf_session.coordinatorHost = self.BATFISH_SERVER
@@ -79,10 +78,13 @@ class BatfishOps:
         bf_set_network(self.NETWORK_NAME)
 
         # Initialize Batfish Snapshot
-        bf_init_snapshot(self.SNAPSHOT_PATH, name=self.NETWORK_NAME, overwrite=True)
+        bf_init_snapshot(SNAPSHOT_PATH, name=self.NETWORK_NAME, overwrite=True)
 
         # Load Batfish Questions
         load_questions()
+
+        self.bfq = bfq
+        self.hc = HeaderConstraints
 
     def question_routing_traceroute(
         self, src_ip, dst_ip, dst_port=None, applications=None
@@ -154,3 +156,4 @@ class BatfishOps:
             node_list.append(node)
 
         return node_list
+
