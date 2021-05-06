@@ -13,16 +13,25 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 from plugins.batfish.includes.route_check import RouteCheck
 
+start_node = "spoke1"
+start_interface = "port4"
+
 def main():
 
     rc = RouteCheck()
+
+    ingress = f"@enter({start_node}[{start_interface}])"
     
-    result = rc.check_route(start_ip="@enter(hub1[port4])", destination_ip="8.8.8.8", snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
+    result = rc.check_route(start_ip=ingress, destination_ip="8.8.8.8", snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
 
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
+    
+    print(result["Flow"][0])
+    print(result["Traces"][0])
 
-    print(result)
+    
+
 
     #next_hops = result["next_hops"]
     #egress_ifaces = result["egress_iface"]
