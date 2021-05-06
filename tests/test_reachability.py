@@ -12,30 +12,23 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 # end fudge python path
 
 
-from plugins.batfish.includes.route_check import RouteCheck
+from plugins.batfish.includes.reachability_check import ReachabilityCheck
 
 start_node = "spoke1"
 start_interface = "port4"
 
 def main():
 
-    rc = RouteCheck()
-
-    ingress = f"@enter({start_node}[{start_interface}])"
-    
-    result = rc.check(ingress=ingress, destination_ip="8.8.8.8", snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
-
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
+
+
+    rc = ReachabilityCheck()
+
     
-    print(result["Flow"][0])
-    print(result["Traces"][0][0][0][0])
+    result = rc.check(start_location="spoke1", destination_ip="8.8.8.8", snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
 
-
-
-
-
-
+    print(result)
 
 
 

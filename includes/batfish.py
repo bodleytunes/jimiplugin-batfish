@@ -1,12 +1,9 @@
 import os
 
-
-# from plugins.batfish.includes import BatfishOps
-
-from pybatfish.client.commands import bf_session, bf_init_snapshot, bf_set_network
+from pybatfish.client.commands import bf_generate_dataplane, bf_session, bf_init_snapshot, bf_set_network
 from pybatfish.question import bfq
 from pybatfish.question.question import load_questions
-from pybatfish.datamodel.flow import HeaderConstraints
+from pybatfish.datamodel.flow import HeaderConstraints, PathConstraints
 
 
 class BatFish:
@@ -79,12 +76,14 @@ class BatfishOps:
 
         # Initialize Batfish Snapshot
         bf_init_snapshot(SNAPSHOT_PATH, name=self.NETWORK_NAME, overwrite=True)
-
+        # Generate Dataplane
+        bf_generate_dataplane()
         # Load Batfish Questions
         load_questions()
 
         self.bfq = bfq
         self.hc = HeaderConstraints
+        self.pc = PathConstraints
 
     def question_routing_traceroute(
         self, src_ip, dst_ip, dst_port=None, applications=None
