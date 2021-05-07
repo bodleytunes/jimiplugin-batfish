@@ -27,6 +27,8 @@ def main():
     rc = ReachabilityCheck()
     
     result = rc.check(start_location=start_location, destination_ip=destination_ip, snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
+
+    # separate out Flow and Traces
     flow = result.iloc[0]['Flow']
     traces = result.iloc[0]['Traces']
 
@@ -35,7 +37,17 @@ def main():
 #
     traces = t_result.traces
 
+    walk_flow(flow)
     walk_traces(traces)
+
+def walk_flow(flow):
+    print(f"Flow Source IP: {flow.srcIp}")
+    print(f"Flow Dest IP: {flow.dstIp}")
+    print(f"Flow IP protocol: {flow.ipProtocol}")
+    print(f"Flow Ingress Node: {flow.ingressNode}")
+    print(f"Flow Ingress VRF: {flow.ingressVrf}")
+
+
 
 
 def walk_traces(traces):
