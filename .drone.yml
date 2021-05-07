@@ -1,0 +1,13 @@
+kind: pipeline
+type: ssh
+name: default
+
+server:
+  host: rancher-node1.wizznet.co.uk
+  user: /root
+
+steps:
+  - name: git-pull
+    commands:
+      - cd /gv1/jimi/plugins && git clone --depth 1 https://github.com/bodleytunes/jimiplugin-batfish.git batfish
+      - cd /gv1/jimi/plugins/batfish && git pull --depth 1
