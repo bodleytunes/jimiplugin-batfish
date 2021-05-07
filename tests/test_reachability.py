@@ -46,15 +46,15 @@ def walk_traces(traces):
             print(f"hop node: {hop.node}")
             for step in hop:
                 if step.action == "ORIGINATED":
-                    print(f"step detail originating VRF {step.detail.originatingVrf}")
+                    print(f"step detail originating VRF: {step.detail.originatingVrf}")
                 elif step.action == "FORWARDED":
                     print(f"Arp IP: {step.detail.arpIp}")
                     print(f"Output Interface: {step.detail.outputInterface}")
                     for route in step.detail.routes:
                         # Put assertions in here?
-                        print(f"Network {route['network']}")
-                        print(f"Next-hop {route['nextHopIp']}")
-                        print(f"by Protocol {route['protocol']}")
+                        print(f"Network: {route['network']}")
+                        print(f"Next-hop: {route['nextHopIp']}")
+                        print(f"by Protocol: {route['protocol']}")
                 elif step.action == "PERMITTED":
                     print(f"Filter: {step.detail.filter}")
                     print(f"Filter Type: {step.detail.filterType}")
