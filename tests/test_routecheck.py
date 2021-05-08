@@ -7,7 +7,6 @@ import pandas as pd
 import pytest
 
 
-
 PACKAGE_PARENT = '../../../'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
@@ -36,8 +35,15 @@ def main():
 
     t_results = results["Traces"]
 
+    walk_flow(flow)
     walk_traces(t_results)
-    
+
+def walk_flow(flow):
+    print(f"Flow Source IP: {flow.srcIp}")
+    print(f"Flow Dest IP: {flow.dstIp}")
+    print(f"Flow IP protocol: {flow.ipProtocol}")
+    print(f"Flow Ingress Node: {flow.ingressNode}")
+    print(f"Flow Ingress VRF: {flow.ingressVrf}")
 
 def walk_traces(t_results):
 
@@ -86,14 +92,6 @@ class TraceResult:
         self.traces = traces
         self.flow = flow
     
-
-
-
-
-
-
-
-
 
 
 
