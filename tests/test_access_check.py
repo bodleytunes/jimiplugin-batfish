@@ -48,7 +48,9 @@ def main():
     #show_denied(results)
     #show_permitted_all(all_results)
 
-    _build_results_dict(ac)
+    result_dict = _build_results_dict(ac)
+
+    _build_access_result(result_dict)
 
 
 
@@ -156,21 +158,82 @@ def show_denied(results):
 def _build_results_dict(ac) -> Dict[str, Any]:
     # todo
     results_dict = defaultdict(list)
+
     for node in node_list:
         result = ac.check(src_ip=src_ip, destination_ip=destination_ip, applications=applications, nodes=node, snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
         results_dict[node].append(result)
 
     return results_dict
 
+def _build_access_result(results_dict):
 
-class TraceResult:
+    # create instance of AccessResult
+    access_result = AccessResult()
 
-    def __init__(self, traces=None, flow=None) -> None:
+    for node, result in results_dict.items():
+
+        access_result.query_node = node
+        for r in result:
+            for v in r.values:
+                if re.search("permit", v[3], re.IGNORECASE):
+                    if len(v[5]) > 0:
+                        for item in v[5]:
+                            for item_child in item.children:
+                                for c in item_child.children:
+                                    if re.search('permitted', c.traceElement.fragments[0].text, re.IGNORECASE):
+                                        for enum, e in enumerate(v):
+                                            if enum == 3:
+                                                print("========================")
+                                                print(f"Flow result : *** {e} ***")
+                                                access_result.flow_result = e
+                                                continue
+                                            if enum == 0:
+                                                print(f"Node Queried is: {e}")
+                                            
+                                            if enum == 1:
+                                                print(f"From zone/iface to zone/iface: {e}")
+                                                access_result.ingress_egress = e
+                                            if enum == 2:
+                                                print(f"Flow details: {e}")
+                                                access_result.flow_details = e
+                                            if enum == 4:
+                                                pass
+                                            if enum == 5:
+                                                print(f"TraceTreeList: {e}")
+                                                print("========================")
+                                                access_result.trace_tree_list = e
+
+
+
+class AccessResult:
+
+    def __init__(self, 
+
+            query_node=None, 
+            flow_result=None,
+            flow_details=None,
+            trace_tree_list=None,
+            ingress_egress=None,
+            source_address=None,
+            destination_address=None,
+            service=None,
+            result_data=None
+
+
+            ) -> None:
         pass
+        
+        self.query_node = query_node
+        self.flow_result = flow_result
+        self.flow_details = flow_details
+        self.trace_tree_list = trace_tree_list
+        self.ingress_egress = ingress_egress
+        self.source_address = source_address
+        self.destination_address = destination_address
+        self.service = service
 
-        self.traces = traces
-        self.flow = flow
-    
+        self.result_data = result_data
+
 
 
 
