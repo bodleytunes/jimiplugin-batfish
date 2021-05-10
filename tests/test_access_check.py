@@ -5,6 +5,7 @@ import os
 
 import pandas as pd
 import pytest
+import re
 
 
 PACKAGE_PARENT = '../../../'
@@ -34,14 +35,21 @@ def main():
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
 
-    #print(results.values)
+    #show_all(results)
+    show_permitted(results)
+    #show_denied(results)
+
+
+
+def show_all(results):
+    # print all results
     for v in results.values:
         for a in v:
             for enum, e in enumerate(v):
                 if enum == 0:
-                    print(f"Node Queried is {e}")
+                    print(f"Node Queried is: {e}")
                 if enum == 1:
-                    print(f"From zone/iface to zone/iface {e}")
+                    print(f"From zone/iface to zone/iface: {e}")
                 if enum == 2:
                     print(f"Flow details: {e}")
                 if enum == 3:
@@ -50,8 +58,55 @@ def main():
                     pass
                 if enum == 5:
                     print(f"TraceTreeList: {e}")
+
             
 
+def show_permitted(results):
+
+    # print only if accepted/permitted
+    for v in results.values:
+        if re.search("permit", v[3], re.IGNORECASE):
+            if len(v[5]) > 0:
+                for item in v[5]:
+                    for item_child in item.children:
+                        for c in item_child.children:
+                            if re.search('permitted', c.traceElement.fragments[0].text, re.IGNORECASE):
+                                for enum, e in enumerate(v):
+                                    if enum == 3:
+                                        print("========================")
+                                        print(f"Flow result : *** {e} ***")
+                                        continue
+                                    if enum == 0:
+                                        print(f"Node Queried is: {e}")
+                                    if enum == 1:
+                                        print(f"From zone/iface to zone/iface: {e}")
+                                    if enum == 2:
+                                        print(f"Flow details: {e}")
+                                    if enum == 4:
+                                        pass
+                                    if enum == 5:
+                                        print(f"TraceTreeList: {e}")
+                                        print("========================")
+
+def show_denied(results):
+
+    # print only if accepted/permitted
+    for v in results.values:
+        if "DENY" in v[3]:
+            for enum, e in enumerate(v):
+                if enum == 3:
+                    print(f"Flow result : *** {e} ***")
+                    continue
+                if enum == 0:
+                    print(f"Node Queried is: {e}")
+                if enum == 1:
+                    print(f"From zone/iface to zone/iface: {e}")
+                if enum == 2:
+                    print(f"Flow details: {e}")
+                if enum == 4:
+                    pass
+                if enum == 5:
+                    print(f"TraceTreeList: {e}")
 
 ## cast assertions
 # disposition accepted?
