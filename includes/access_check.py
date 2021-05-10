@@ -28,8 +28,7 @@ class AccessCheck(BatFish):
                      applications=applications)
 
         t = b.bfq.testFilters(headers=flow,
-                         nodes=nodes,
-                         filters="acl_in")
+                         nodes=nodes)
 
         
 

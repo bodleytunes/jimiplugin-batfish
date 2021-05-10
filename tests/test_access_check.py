@@ -14,10 +14,11 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 from plugins.batfish.includes.access_check import AccessCheck
 
-src_ip = "10.10.10.1"
-destination_ip = "218.8.104.58"
-applications =["dns"]
-nodes = "hub1"
+src_ip = "10.1.255.100"
+destination_ip = "10.3.255.100"
+#applications =["dns"]
+applications =["icmp"]
+nodes = "spoke1"
 
 
 @pytest.mark.batfish
