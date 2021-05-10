@@ -32,6 +32,7 @@ class AccessResult(object):
 
             query_node=None, 
             flow_result=None,
+            denied=None,
             flow_details=None,
             trace_tree_list=None,
             ingress_egress=None,
@@ -46,6 +47,7 @@ class AccessResult(object):
         
         self.query_node = query_node
         self.flow_result = flow_result
+        self.denied = True
         self.flow_details = flow_details
         self.trace_tree_list = trace_tree_list
         self.ingress_egress = ingress_egress
@@ -201,14 +203,14 @@ def _build_access_result(results_dict) -> AccessResult:
 
     for node, result in results_dict.items():
 
-        # create instance of AccessResult
-        access_result = AccessResult()
 
-        # setup the basic class data
-        access_result.query_node = node
         for r in result:
+
             for v in r.values:
                 if re.search("permit", v[3], re.IGNORECASE):
+                    access_result = AccessResult()
+                    access_result.query_node = node
+
                     if len(v[5]) > 0:
                         for item in v[5]:
                             for item_child in item.children:
@@ -235,8 +237,20 @@ def _build_access_result(results_dict) -> AccessResult:
                                                 print(f"TraceTreeList: {e}")
                                                 print("========================")
                                                 access_result.trace_tree_list = e
+                    
+                    if access_result.flow_result == "PERMIT":
+                        access_result.denied == False
+                        access_results.append(access_result)
+                else:
+                    # todo - generate a DENY entry
+                    access_result.denied == True
+                    access_result = AccessResult()
+                    access_result.query_node = node
+                    access_results.append(access_result)
 
-        access_results.append(access_result)
+
+
+                    
 
 
     return access_results
