@@ -26,7 +26,7 @@ applications = ["https"]
 nodes = "spoke1"
 node_list = ["spoke1", "spoke2"]
 
-class AccessResult(object):
+class AcceptResult(object):
 
     def __init__(self, 
 
@@ -56,6 +56,20 @@ class AccessResult(object):
         self.service = service
 
         self.result_data = result_data
+
+
+class DeniedResult(object):
+
+    def __init__(self, 
+
+            query_node=None, 
+            denied=None,
+
+            ) -> None:
+        pass
+        
+        self.query_node = query_node  
+        self.denied = True
 
 
 @pytest.mark.batfish
@@ -197,9 +211,10 @@ def _build_results_dict(ac) -> Dict[str, Any]:
 
     return results_dict
 
-def _build_access_result(results_dict) -> AccessResult:
+def _build_access_result(results_dict) -> AcceptResult:
 
     access_results = []
+    denied_results = []
 
     for node, result in results_dict.items():
 
@@ -208,7 +223,7 @@ def _build_access_result(results_dict) -> AccessResult:
 
             for v in r.values:
                 if re.search("permit", v[3], re.IGNORECASE):
-                    access_result = AccessResult()
+                    access_result = AcceptResult()
                     access_result.query_node = node
 
                     if len(v[5]) > 0:
@@ -241,19 +256,28 @@ def _build_access_result(results_dict) -> AccessResult:
                     if access_result.flow_result == "PERMIT":
                         access_result.denied == False
                         access_results.append(access_result)
+
+
                 else:
                     # todo - generate a DENY entry
-                    access_result.denied == True
-                    access_result = AccessResult()
-                    access_result.query_node = node
-                    access_results.append(access_result)
+                    
+                    denied_result = DeniedResult()
 
+                    denied_result.denied == True
+                    denied_result.query_node = node
 
+                    denied_results.append(denied_result)
+                
+                #denied_list_condensed = [d for d in denied_results if d.denied == True]
 
+    #merged_set = set(i.query_node for i in denied_list_condensed)
+    merged_results = [*access_results, *denied_results]
+
+    
                     
 
 
-    return access_results
+    return merged_results
 
 
 
