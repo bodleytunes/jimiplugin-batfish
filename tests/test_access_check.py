@@ -2,6 +2,9 @@
 # Fudge the python path
 import sys
 import os
+from typing import Any, Dict
+from collections import defaultdict
+
 
 import pandas as pd
 import pytest
@@ -18,7 +21,8 @@ from plugins.batfish.includes.access_check import AccessCheck
 src_ip = "10.1.255.100"
 destination_ip = "10.3.255.100"
 #applications =["dns"]
-applications =["icmp"]
+#applications =["icmp"]
+applications = ["https"]
 nodes = "spoke1"
 node_list = ["spoke1", "spoke2"]
 
@@ -30,37 +34,40 @@ def main():
 
     
     results = ac.check(src_ip=src_ip, destination_ip=destination_ip, applications=applications, nodes=nodes, snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
+    
     all_results = []
-    for node in node_list:
-        all_results.append(ac.check(src_ip=src_ip, destination_ip=destination_ip, applications=applications, nodes=node, snapshot_folder="/shared/data/storage/firewall-configs/snapshot"))
+
+    
+    
 
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
 
     #show_all(results)
-    show_permitted(results)
+    #show_permitted(results)
     #show_denied(results)
-    show_permitted_all(all_results)
+    #show_permitted_all(all_results)
+
+    _build_results_dict(ac)
 
 
 
 def show_all(results):
     # print all results
     for v in results.values:
-        for a in v:
-            for enum, e in enumerate(v):
-                if enum == 0:
-                    print(f"Node Queried is: {e}")
-                if enum == 1:
-                    print(f"From zone/iface to zone/iface: {e}")
-                if enum == 2:
-                    print(f"Flow details: {e}")
-                if enum == 3:
-                    print(f"Flow result : *** {e} ***")
-                if enum == 4:
-                    pass
-                if enum == 5:
-                    print(f"TraceTreeList: {e}")
+        for enum, e in enumerate(v):
+            if enum == 0:
+                print(f"Node Queried is: {e}")
+            if enum == 1:
+                print(f"From zone/iface to zone/iface: {e}")
+            if enum == 2:
+                print(f"Flow details: {e}")
+            if enum == 3:
+                print(f"Flow result : *** {e} ***")
+            if enum == 4:
+                pass
+            if enum == 5:
+                print(f"TraceTreeList: {e}")
 
             
 
@@ -91,8 +98,10 @@ def show_permitted(results):
                                         print(f"TraceTreeList: {e}")
                                         print("========================")
 
+
 def show_permitted_all(all_results):
 
+    hits: int = 0
     # print only if accepted/permitted
     for result in all_results:
         for v in result.values:
@@ -102,6 +111,7 @@ def show_permitted_all(all_results):
                         for item_child in item.children:
                             for c in item_child.children:
                                 if re.search('permitted', c.traceElement.fragments[0].text, re.IGNORECASE):
+                                    hits +=1
                                     for enum, e in enumerate(v):
                                         if enum == 3:
                                             print("========================")
@@ -118,6 +128,10 @@ def show_permitted_all(all_results):
                                         if enum == 5:
                                             print(f"TraceTreeList: {e}")
                                             print("========================")
+    if hits == 0:
+        print(f"DENIED ON HOST: ")
+
+
 
 def show_denied(results):
 
@@ -139,8 +153,14 @@ def show_denied(results):
                 if enum == 5:
                     print(f"TraceTreeList: {e}")
 
-## cast assertions
-# disposition accepted?
+def _build_results_dict(ac) -> Dict[str, Any]:
+    # todo
+    results_dict = defaultdict(list)
+    for node in node_list:
+        result = ac.check(src_ip=src_ip, destination_ip=destination_ip, applications=applications, nodes=node, snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
+        results_dict[node].append(result)
+
+    return results_dict
 
 
 class TraceResult:
