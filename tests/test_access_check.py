@@ -26,6 +26,35 @@ applications = ["https"]
 nodes = "spoke1"
 node_list = ["spoke1", "spoke2"]
 
+class AccessResult(object):
+
+    def __init__(self, 
+
+            query_node=None, 
+            flow_result=None,
+            flow_details=None,
+            trace_tree_list=None,
+            ingress_egress=None,
+            source_address=None,
+            destination_address=None,
+            service=None,
+            result_data=None
+
+
+            ) -> None:
+        pass
+        
+        self.query_node = query_node
+        self.flow_result = flow_result
+        self.flow_details = flow_details
+        self.trace_tree_list = trace_tree_list
+        self.ingress_egress = ingress_egress
+        self.source_address = source_address
+        self.destination_address = destination_address
+        self.service = service
+
+        self.result_data = result_data
+
 
 @pytest.mark.batfish
 def main():
@@ -38,7 +67,6 @@ def main():
     all_results = []
 
     
-    
 
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
@@ -50,7 +78,9 @@ def main():
 
     result_dict = _build_results_dict(ac)
 
-    _build_access_result(result_dict)
+    # build new access_result object
+    access_results = _build_access_result(result_dict)
+    print(access_results)
 
 
 
@@ -156,7 +186,7 @@ def show_denied(results):
                     print(f"TraceTreeList: {e}")
 
 def _build_results_dict(ac) -> Dict[str, Any]:
-    # todo
+
     results_dict = defaultdict(list)
 
     for node in node_list:
@@ -165,13 +195,16 @@ def _build_results_dict(ac) -> Dict[str, Any]:
 
     return results_dict
 
-def _build_access_result(results_dict):
+def _build_access_result(results_dict) -> AccessResult:
 
-    # create instance of AccessResult
-    access_result = AccessResult()
+    access_results = []
 
     for node, result in results_dict.items():
 
+        # create instance of AccessResult
+        access_result = AccessResult()
+
+        # setup the basic class data
         access_result.query_node = node
         for r in result:
             for v in r.values:
@@ -203,36 +236,13 @@ def _build_access_result(results_dict):
                                                 print("========================")
                                                 access_result.trace_tree_list = e
 
+        access_results.append(access_result)
 
 
-class AccessResult:
-
-    def __init__(self, 
-
-            query_node=None, 
-            flow_result=None,
-            flow_details=None,
-            trace_tree_list=None,
-            ingress_egress=None,
-            source_address=None,
-            destination_address=None,
-            service=None,
-            result_data=None
+    return access_results
 
 
-            ) -> None:
-        pass
-        
-        self.query_node = query_node
-        self.flow_result = flow_result
-        self.flow_details = flow_details
-        self.trace_tree_list = trace_tree_list
-        self.ingress_egress = ingress_egress
-        self.source_address = source_address
-        self.destination_address = destination_address
-        self.service = service
 
-        self.result_data = result_data
 
 
 
