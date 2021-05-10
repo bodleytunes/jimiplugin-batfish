@@ -33,6 +33,8 @@ def main():
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
 
+
+    flow = results["Flow"]
     t_results = results["Traces"]
 
     walk_flow(flow)

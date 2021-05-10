@@ -10,7 +10,7 @@ class AccessCheck(BatFish):
         self.destination_ip = destination_ip
         self.applications = applications
         self.snapshot_folder = snapshot_folder
-        self.nodes = "hub1"
+        self.nodes = "hub2"
 
         pass
 
