@@ -111,7 +111,7 @@ class _batfishAccessCheck(action._action):
         if client:
 
             # Make the actual batfish query
-            """
+
             permit_results, deny_results, merged_results = client.get_results(
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
@@ -123,9 +123,10 @@ class _batfishAccessCheck(action._action):
             # data["eventData"]["remote"]["access_results"] = results
             data["eventData"]["remote"]["permit_results"] = permit_results
             data["eventData"]["remote"]["deny_results"] = deny_results
-            """
 
-            if len(data) > 0:
+            if (len(data["eventData"]["remote"]["permit_results"])) > 0 or (
+                len(data["eventData"]["remote"]["deny_results"])
+            ) > 0:
                 exitCode = 0
             else:
                 exitCode = 255

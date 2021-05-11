@@ -157,17 +157,13 @@ class AccessCheck(BatFish):
                                         ):
                                             for enum, e in enumerate(v):
                                                 if enum == 3:
-                                                    print("========================")
-                                                    print(f"Flow result : *** {e} ***")
                                                     access_result.flow_result = e
                                                     continue
                                                 if enum == 0:
                                                     print(f"Node Queried is: {e}")
 
                                                 if enum == 1:
-                                                    print(
-                                                        f"From zone/iface to zone/iface: {e}"
-                                                    )
+
                                                     access_result.ingress_egress = e
 
                                                     # split ingress egress string
@@ -192,7 +188,6 @@ class AccessCheck(BatFish):
                                                         egress_iface
                                                     )
                                                 if enum == 2:
-                                                    print(f"Flow details: {e}")
                                                     access_result.flow_details = e
                                                     # other details
                                                     access_result.destination_address = (
