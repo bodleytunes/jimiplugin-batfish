@@ -103,10 +103,15 @@ class _batfishAccessCheck(action._action):
 
     def doAction(self, data):
 
-        if ac:
+        try:
+            client = data["eventData"]["remote"]["client"]
+        except KeyError:
+            client = None
+
+        if client:
 
             # Make the actual batfish query
-            results = ac.get_results(
+            results = client.get_results(
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
                 applications=self.applications,
