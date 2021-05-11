@@ -109,7 +109,7 @@ class _batfishAccessCheck(action._action):
         if ac:
 
             # Make the actual batfish query
-            exitCode, errors, results = ac.get_results(
+            results = ac.get_results(
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
                 applications=self.applications,
@@ -118,19 +118,21 @@ class _batfishAccessCheck(action._action):
 
             data["eventData"]["batfish"]["access_results"] = results
 
-            if exitCode != None:
+            if len(results) == 0:
+                exitCode = 1
+            if exitCode == 0:
                 return {
                     "result": True,
                     "rc": exitCode,
-                    "msg": "Command succesfull",
+                    "msg": "Query Successful",
                     "data": data,
-                    "errors": errors,
+                    "errors": "",
                 }
             else:
                 return {
                     "result": False,
                     "rc": 255,
-                    "msg": ac.error,
+                    "msg": "General Protection Error!",
                     "data": "",
                     "errors": "",
                 }
