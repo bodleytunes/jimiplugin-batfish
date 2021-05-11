@@ -119,7 +119,10 @@ class _batfishAccessCheck(action._action):
             data["eventData"]["batfish"]["access_results"] = results
 
             if len(results) == 0:
-                exitCode = 1
+                exitCode = 255
+            else:
+                exitCode = 0
+
             if exitCode == 0:
                 return {
                     "result": True,
@@ -138,3 +141,11 @@ class _batfishAccessCheck(action._action):
                 }
         else:
             return {"result": False, "rc": 403, "msg": "No connection found"}
+
+    def setAttribute(self, attr, value, sessionData=None):
+        if attr == "password" and not value.startswith("ENC "):
+            self.password = "ENC {0}".format(auth.getENCFromPassword(value))
+            return True
+        return super(_batfishAccessCheck, self).setAttribute(
+            attr, value, sessionData=sessionData
+        )
