@@ -95,27 +95,6 @@ class DeniedResult(object):
 @pytest.mark.batfish
 def main():
 
-    ac = AccessCheck(
-        batfish_server="10.12.12.134",
-        snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
-    )
-
-    """
-    * Initialize AccessCheck Object from access_check.py
-    * run check() function, pass in args, creates batfish() object
-    * inits batfish() object
-    * creates flow from passed in args
-    * Batfish make a Query "testFilters" and pass in "flow" and "nodes" as args
-    * returns resulting answer as a dataframe
-    """
-    # results = ac.check(
-    #    src_ip=src_ip,
-    #    destination_ip=destination_ip,
-    #    applications=applications,
-    #    nodes=nodes,
-    #    snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
-    # )
-
     """
     * Initialize AccessCheck Object from access_check.py
     * run _build_results_dict and pass in AccessCheck() object as arg
@@ -124,6 +103,12 @@ def main():
     * Batfish make a Query "testFilters" and pass in "flow" and "nodes" as args
     * returns resulting answer as a dataframe
     """
+
+    ac = AccessCheck(
+        batfish_server="10.12.12.134",
+        snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+    )
+
     results = ac.get_results(
         src_ip=src_ip,
         destination_ip=destination_ip,
