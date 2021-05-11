@@ -243,6 +243,7 @@ class AccessCheck(BatFish):
 
         merged_results = [*access_results, *denied_results]
 
+        # todo
         permit_results = [obj.__dict__ for obj in access_results]
         deny_results = [obj.__dict__ for obj in denied_results]
 
