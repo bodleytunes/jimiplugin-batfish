@@ -101,7 +101,7 @@ class AccessCheck(BatFish):
 
         flow = b.hc(srcIps=src_ip, dstIps=destination_ip, applications=applications)
 
-        t = b.bfq.testFilters(headers=flow, nodes=self.nodes)
+        t = b.bfq.testFilters(headers=flow, nodes=nodes)
 
         result = t.answer().frame()
 

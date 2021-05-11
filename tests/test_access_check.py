@@ -31,8 +31,8 @@ destination_ip = "10.3.255.100"
 applications = ["https"]
 
 # Nodes to query
-nodes = "spoke1"
-node_list = ["spoke1", "spoke2"]
+# nodes = ["spoke1"]
+nodes = ["spoke1", "spoke2"]
 
 # OUTPUT OBJECTS
 class AcceptResult(object):
@@ -124,16 +124,14 @@ def main():
     * Batfish make a Query "testFilters" and pass in "flow" and "nodes" as args
     * returns resulting answer as a dataframe
     """
-    result_dict = ac.get_results(
+    results = ac.get_results(
         src_ip=src_ip,
         destination_ip=destination_ip,
         applications=applications,
         nodes=nodes,
     )
 
-    # build new access_result object
-    access_results = ac.build_access_result(result_dict)
-    print(access_results)
+    print(results)
 
 
 # def get_results(
