@@ -107,9 +107,9 @@ class _batfishAccessCheck(action._action):
             client = None
 
         if client:
-            # ac = AccessCheck()
 
-            exitCode, errors, results = client.check(
+            # Make the actual batfish query
+            exitCode, errors, results = client.build_results_dict(
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
                 applications=self.applications,
@@ -117,10 +117,7 @@ class _batfishAccessCheck(action._action):
                 snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
             )
 
-            # Make the actual batfish query
-            access_results = ac.build_results_dict(ac)
-
-            data["eventData"]["batfish"]["access_results"] = access_results
+            data["eventData"]["batfish"]["access_results"] = results
 
             if exitCode != None:
                 return {
