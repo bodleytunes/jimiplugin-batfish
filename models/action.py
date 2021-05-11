@@ -118,10 +118,10 @@ class _batfishAccessCheck(action._action):
 
             data["eventData"]["batfish"]["access_results"] = results
 
-            if len(results) == 0:
-                exitCode = 255
-            else:
+            if len(data) > 0:
                 exitCode = 0
+            else:
+                exitCode = 255
 
             if exitCode == 0:
                 return {
