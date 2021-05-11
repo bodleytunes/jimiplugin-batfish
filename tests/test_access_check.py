@@ -1,7 +1,7 @@
 # Fudge the python path
 import sys
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union, List
 from collections import defaultdict
 
 import pandas as pd
@@ -19,7 +19,7 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from plugins.batfish.includes.access_check import AccessCheck
 
 
-# INPUTS
+# INPUT FIELDS
 
 # IP's
 src_ip = "10.1.255.100"
@@ -34,28 +34,28 @@ applications = ["icmp"]
 nodes = "spoke1"
 node_list = ["spoke1", "spoke2"]
 
-
+# OUTPUT OBJECTS
 class AcceptResult(object):
     def __init__(
         self,
-        query_node=None,
-        flow_result=None,
-        flow_details=None,
-        trace_tree_list=None,
-        ingress_egress=None,
-        ingress_zone=None,
-        ingress_interface=None,
-        egress_interface=None,
-        egress_zone=None,
-        ingress_vrf=None,
-        ingress_node=None,
-        source_address=None,
-        destination_address=None,
-        service=None,
-        ip_protocol=None,
-        permit_rule=None,
-        rule_id=None,
-        result_data=None,
+        query_node: Optional[str] = None,
+        flow_result: Optional[str] = None,
+        flow_details: Optional[str] = None,
+        trace_tree_list: Optional[str] = None,
+        ingress_egress: Optional[str] = None,
+        ingress_zone: Optional[str] = None,
+        ingress_interface: Optional[str] = None,
+        egress_interface: Optional[str] = None,
+        egress_zone: Optional[str] = None,
+        ingress_vrf: Optional[str] = None,
+        ingress_node: Optional[str] = None,
+        source_address: Optional[str] = None,
+        destination_address: Optional[str] = None,
+        service: Optional[str] = None,
+        ip_protocol: Optional[str] = None,
+        permit_rule: Optional[str] = None,
+        rule_id: Optional[str] = None,
+        result_data: Optional[str] = None,
     ) -> None:
         pass
 
@@ -83,8 +83,8 @@ class AcceptResult(object):
 class DeniedResult(object):
     def __init__(
         self,
-        query_node=None,
-        denied=None,
+        query_node: Optional[str] = None,
+        denied: Optional[str] = None,
     ) -> None:
         pass
 
@@ -110,124 +110,11 @@ def main():
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
 
-    # show_all(results)
-    # show_permitted(results)
-    # show_denied(results)
-    # show_permitted_all(all_results)
-
     result_dict = _build_results_dict(ac)
 
     # build new access_result object
     access_results = _build_access_result(result_dict)
     print(access_results)
-
-
-def show_all(results):
-    # print all results
-    for v in results.values:
-        for enum, e in enumerate(v):
-            if enum == 0:
-                print(f"Node Queried is: {e}")
-            if enum == 1:
-                print(f"From zone/iface to zone/iface: {e}")
-            if enum == 2:
-                print(f"Flow details: {e}")
-            if enum == 3:
-                print(f"Flow result : *** {e} ***")
-            if enum == 4:
-                pass
-            if enum == 5:
-                print(f"TraceTreeList: {e}")
-
-
-def show_permitted(results):
-
-    # print only if accepted/permitted
-    for v in results.values:
-        if re.search("permit", v[3], re.IGNORECASE):
-            if len(v[5]) > 0:
-                for item in v[5]:
-                    for item_child in item.children:
-                        for c in item_child.children:
-                            if re.search(
-                                "permitted",
-                                c.traceElement.fragments[0].text,
-                                re.IGNORECASE,
-                            ):
-                                for enum, e in enumerate(v):
-                                    if enum == 3:
-                                        print("========================")
-                                        print(f"Flow result : *** {e} ***")
-                                        continue
-                                    if enum == 0:
-                                        print(f"Node Queried is: {e}")
-                                    if enum == 1:
-                                        print(f"From zone/iface to zone/iface: {e}")
-                                    if enum == 2:
-                                        print(f"Flow details: {e}")
-                                    if enum == 4:
-                                        pass
-                                    if enum == 5:
-                                        print(f"TraceTreeList: {e}")
-                                        print("========================")
-
-
-def show_permitted_all(all_results):
-
-    hits: int = 0
-    # print only if accepted/permitted
-    for result in all_results:
-        for v in result.values:
-            if re.search("permit", v[3], re.IGNORECASE):
-                if len(v[5]) > 0:
-                    for item in v[5]:
-                        for item_child in item.children:
-                            for c in item_child.children:
-                                if re.search(
-                                    "permitted",
-                                    c.traceElement.fragments[0].text,
-                                    re.IGNORECASE,
-                                ):
-                                    hits += 1
-                                    for enum, e in enumerate(v):
-                                        if enum == 3:
-                                            print("========================")
-                                            print(f"Flow result : *** {e} ***")
-                                            continue
-                                        if enum == 0:
-                                            print(f"Node Queried is: {e}")
-                                        if enum == 1:
-                                            print(f"From zone/iface to zone/iface: {e}")
-                                        if enum == 2:
-                                            print(f"Flow details: {e}")
-                                        if enum == 4:
-                                            pass
-                                        if enum == 5:
-                                            print(f"TraceTreeList: {e}")
-                                            print("========================")
-    if hits == 0:
-        print(f"DENIED ON HOST: ")
-
-
-def show_denied(results):
-
-    # print only if accepted/permitted
-    for v in results.values:
-        if "DENY" in v[3]:
-            for enum, e in enumerate(v):
-                if enum == 3:
-                    print(f"Flow result : *** {e} ***")
-                    continue
-                if enum == 0:
-                    print(f"Node Queried is: {e}")
-                if enum == 1:
-                    print(f"From zone/iface to zone/iface: {e}")
-                if enum == 2:
-                    print(f"Flow details: {e}")
-                if enum == 4:
-                    pass
-                if enum == 5:
-                    print(f"TraceTreeList: {e}")
 
 
 def _build_results_dict(ac) -> Dict[str, Any]:
@@ -247,7 +134,7 @@ def _build_results_dict(ac) -> Dict[str, Any]:
     return results_dict
 
 
-def _build_access_result(results_dict) -> AcceptResult:
+def _build_access_result(results_dict) -> Union[AcceptResult, DeniedResult]:
 
     access_results = []
     denied_results = []
@@ -345,7 +232,7 @@ def _build_access_result(results_dict) -> AcceptResult:
                         access_results.append(access_result)
 
                 else:
-                    # todo - generate a DENY entry
+                    # generate a DENY entry
 
                     denied_result = DeniedResult()
 
