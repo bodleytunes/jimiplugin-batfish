@@ -104,9 +104,7 @@ class _batfishAccessCheck(action._action):
             client = data["eventData"]["batfish"]["client"]
         except KeyError:
             client = None
-        # set dest folder sane defaults
-        if self.dstFolder == None or self.dstFolder == "":
-            self.dstFolder = "/shared/data/storage/firewall-configs/snapshots/configs"
+
         if client:
             ac = AccessCheck()
 

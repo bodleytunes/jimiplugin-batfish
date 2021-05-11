@@ -115,7 +115,7 @@ class AccessCheck(BatFish):
                 destination_ip=self.destination_ip,
                 applications=self.applications,
                 nodes=node,
-                snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+                snapshot_folder=self.snapshot_folder,
             )
             results_dict[node].append(result)
 
