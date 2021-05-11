@@ -72,14 +72,14 @@ class _remoteConnectBatfish(action._action):
             snapshot_folder=self.snapshot_folder,
         )
 
-        if client != None:
-            data["eventData"]["batfish"] = {"client": client}
+        if ac != None:
+            data["eventData"]["batfish"] = {"client": ac}
             return {"result": True, "rc": 0, "msg": "Initiated Batfish Session"}
         else:
             return {
                 "result": False,
                 "rc": 403,
-                "msg": "Connection failed - {0}".format(client.error),
+                "msg": "Connection failed - {0}".format(ac.error),
             }
 
     def setAttribute(self, attr, value, sessionData=None):
