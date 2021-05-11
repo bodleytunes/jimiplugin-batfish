@@ -98,7 +98,7 @@ class _batfishAccessCheck(action._action):
     src_ip = str()
     destination_ip = str()
     applications = list()
-    node_list = list()
+    nodes = list()
 
     def doAction(self, data):
         try:
@@ -109,7 +109,12 @@ class _batfishAccessCheck(action._action):
         if ac:
 
             # Make the actual batfish query
-            exitCode, errors, results = ac.get_results()
+            exitCode, errors, results = ac.get_results(
+                src_ip=self.src_ip,
+                destination_ip=self.destination_ip,
+                applications=self.applications,
+                nodes=self.nodes,
+            )
 
             data["eventData"]["batfish"]["access_results"] = results
 
@@ -125,7 +130,7 @@ class _batfishAccessCheck(action._action):
                 return {
                     "result": False,
                     "rc": 255,
-                    "msg": client.error,
+                    "msg": ac.error,
                     "data": "",
                     "errors": "",
                 }

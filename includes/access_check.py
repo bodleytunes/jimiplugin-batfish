@@ -118,9 +118,7 @@ class AccessCheck(BatFish):
 
         results_dict = defaultdict(list)
 
-        node_list = self.nodes
-
-        for node in node_list:
+        for node in self.nodes:
             result = self.check(
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
