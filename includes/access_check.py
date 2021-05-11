@@ -64,6 +64,7 @@ class DeniedResult(object):
 class AccessCheck(BatFish):
     def __init__(
         self,
+        batfish_server: Optional[str] = None,
         host: Optional[str] = None,
         ingress: Optional[str] = None,
         src_ip: Optional[str] = None,
@@ -73,6 +74,7 @@ class AccessCheck(BatFish):
         snapshot_folder: Optional[str] = None,
     ):
 
+        self.batfish_server = batfish_server
         self.host = host
         self.src_ip = src_ip
         self.destination_ip = destination_ip
@@ -93,7 +95,9 @@ class AccessCheck(BatFish):
     ):
 
         b = BatfishOps()
-        b.init_batfish(snapshot_folder=snapshot_folder)
+        b.init_batfish(
+            BATFISH_SERVER=self.batfish_server, snapshot_folder=self.snapshot_folder
+        )
 
         flow = b.hc(srcIps=src_ip, dstIps=destination_ip, applications=applications)
 
@@ -241,7 +245,7 @@ class AccessCheck(BatFish):
 
         return merged_results
 
-    def _split_ingress_egress(ingress_egress):
+    def _split_ingress_egress(self, ingress_egress):
 
         split_list = ingress_egress.split("~")
 
