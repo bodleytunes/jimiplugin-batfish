@@ -70,10 +70,6 @@ class _remoteConnectBatfish(action._action):
         client = AccessCheck(
             host=host,
             snapshot_folder=self.snapshot_folder,
-            src_ip=self.src_ip,
-            destination_ip=self.destination_ip,
-            applications=self.applications,
-            nodes=self.node_list,
         )
 
         if client != None:
@@ -113,7 +109,12 @@ class _batfishAccessCheck(action._action):
         if client:
 
             # Make the actual batfish query
-            exitCode, errors, results = client.build_results_dict()
+            exitCode, errors, results = client.get_results(
+                src_ip=self.src_ip,
+                destination_ip=self.destination_ip,
+                applications=self.applications,
+                nodes=self.node_list,
+            )
 
             data["eventData"]["batfish"]["access_results"] = results
 

@@ -101,7 +101,16 @@ class AccessCheck(BatFish):
 
         result = t.answer().frame()
 
-    def build_results_dict(self) -> Dict[str, Any]:
+        return result
+
+    def get_results(
+        self, src_ip=None, destination_ip=None, applications=None, nodes=None
+    ) -> Dict[str, Any]:
+
+        self.src_ip = src_ip
+        self.destination_ip = destination_ip
+        self.applications = applications
+        self.nodes = nodes
 
         results_dict = defaultdict(list)
 
