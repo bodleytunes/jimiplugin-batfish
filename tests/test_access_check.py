@@ -5,7 +5,6 @@ import os
 from typing import Any, Dict
 from collections import defaultdict
 
-
 import pandas as pd
 import pytest
 import re
@@ -18,11 +17,19 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 from plugins.batfish.includes.access_check import AccessCheck
 
+
+# INPUTS
+
+# IP's
 src_ip = "10.1.255.100"
 destination_ip = "10.3.255.100"
+
+# Services
 #applications =["dns"]
-#applications =["icmp"]
-applications = ["https"]
+applications =["icmp"]
+#applications = ["https"]
+
+# Nodes to query
 nodes = "spoke1"
 node_list = ["spoke1", "spoke2"]
 
@@ -36,6 +43,7 @@ class AcceptResult(object):
             trace_tree_list=None,
             ingress_egress=None,
             ingress_interface=None,
+            egress_interface=None,
             ingress_vrf=None,
             ingress_node=None,
             source_address=None,
@@ -56,6 +64,7 @@ class AcceptResult(object):
         self.trace_tree_list = trace_tree_list
         self.ingress_egress = ingress_egress
         self.ingress_interface = ingress_interface
+        self.egress_interface = egress_interface
         self.ingress_vrf = ingress_vrf
         self.ingress_node = ingress_node
         self.source_address = source_address
@@ -293,6 +302,7 @@ def _build_access_result(results_dict) -> AcceptResult:
 
     
                     
+
 
 
     return merged_results
