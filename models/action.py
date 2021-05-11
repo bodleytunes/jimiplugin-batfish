@@ -99,7 +99,6 @@ class _batfishAccessCheck(action._action):
     node_list = list()
 
     def doAction(self, data):
-        command = helpers.evalString(self.command, {"data": data["flowData"]})
         try:
             client = data["eventData"]["batfish"]["client"]
         except KeyError:
@@ -116,14 +115,16 @@ class _batfishAccessCheck(action._action):
                 snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
             )
 
-            ac.build_results_dict(ac)
+            access_results = ac.build_results_dict(ac)
+
+            data["eventData"]["batfish"]["access_results"] = access_results
 
             if exitCode != None:
                 return {
                     "result": True,
                     "rc": exitCode,
                     "msg": "Command succesfull",
-                    "data": "config saved!",
+                    "data": data,
                     "errors": errors,
                 }
             else:
