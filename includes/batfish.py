@@ -20,7 +20,7 @@ class BatFish:
         device_type: str,
         batfish_server: str,
         batfish_network: str,
-        snapshots_dir=None,
+        snapshot_folder=None,
     ) -> None:
 
         self.ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -36,8 +36,8 @@ class BatFish:
         self.device_type = "FIREWALL"
 
         self.dest_dir = str()
-        # self.snapshots_dir = os.path.join(self.ROOT_DIR, "snapshots")
-        self.snapshots_dir = "/shared/data/storage/firewall-configs/snapshot"
+        # self.snapshot_folder = os.path.join(self.ROOT_DIR, "snapshots")
+        # self.snapshot_folder = "/shared/data/storage/firewall-configs/snapshot"
 
 
 class BatfishOps:

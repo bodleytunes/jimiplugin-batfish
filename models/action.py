@@ -15,7 +15,7 @@ class _batfish(action._action):
     batfish_server = str()
     batfish_network = str()
     device_type = str()
-    snapshots_dir = str()
+    snapshot_folder = str()
 
     def doAction(self, data) -> dict:
 
@@ -30,8 +30,8 @@ class _batfish(action._action):
             self.batfish_network, {"data": data["flowData"]}
         )
         device_type = helpers.evalString(self.device_type, {"data": data["flowData"]})
-        snapshots_dir = helpers.evalString(
-            self.snapshots_dir, {"data": data["flowData"]}
+        snapshot_folder = helpers.evalString(
+            self.snapshot_folder, {"data": data["flowData"]}
         )
 
         # Call Batfish Includes
@@ -42,7 +42,7 @@ class _batfish(action._action):
             batfish_server,
             batfish_network,
             device_type,
-            snapshots_dir=snapshots_dir,
+            snapshot_folder=snapshot_folder,
         )
 
         # Get batfish data
@@ -61,14 +61,14 @@ class _batfish(action._action):
 
 class _remoteConnectBatfish(action._action):
     host = str()
-    snapshots_dir = str()
+    snapshot_folder = str()
 
     def doAction(self, data):
         host = helpers.evalString(self.host, {"data": data["flowData"]})
 
         # create instance of BatFishOps
         client = batfish.BatfishOps()
-        client.init_batfish(host, snapshots_dir=self.snapshots_dir)
+        client.init_batfish(host, snapshot_folder=self.snapshot_folder)
 
         if client.client != None:
             data["eventData"]["batfish"] = {"client": client}
