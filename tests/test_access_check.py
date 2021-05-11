@@ -1,8 +1,7 @@
-
 # Fudge the python path
 import sys
 import os
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from collections import defaultdict
 
 import pandas as pd
@@ -10,8 +9,10 @@ import pytest
 import re
 
 
-PACKAGE_PARENT = '../../../'
-SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+PACKAGE_PARENT = "../../../"
+SCRIPT_DIR = os.path.dirname(
+    os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__)))
+)
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 # end fudge python path
 
@@ -25,41 +26,39 @@ src_ip = "10.1.255.100"
 destination_ip = "10.3.255.100"
 
 # Services
-#applications =["dns"]
-applications =["icmp"]
-#applications = ["https"]
+# applications =["dns"]
+applications = ["icmp"]
+# applications = ["https"]
 
 # Nodes to query
 nodes = "spoke1"
 node_list = ["spoke1", "spoke2"]
 
+
 class AcceptResult(object):
-
-    def __init__(self, 
-
-            query_node=None, 
-            flow_result=None,
-            flow_details=None,
-            trace_tree_list=None,
-            ingress_egress=None,
-            ingress_zone=None,
-            ingress_interface=None,
-            egress_interface=None,
-            egress_zone=None,
-            ingress_vrf=None,
-            ingress_node=None,
-            source_address=None,
-            destination_address=None,
-            service=None,
-            ip_protocol=None,
-            permit_rule=None,
-            rule_id=None,
-            result_data=None
-
-
-            ) -> None:
+    def __init__(
+        self,
+        query_node=None,
+        flow_result=None,
+        flow_details=None,
+        trace_tree_list=None,
+        ingress_egress=None,
+        ingress_zone=None,
+        ingress_interface=None,
+        egress_interface=None,
+        egress_zone=None,
+        ingress_vrf=None,
+        ingress_node=None,
+        source_address=None,
+        destination_address=None,
+        service=None,
+        ip_protocol=None,
+        permit_rule=None,
+        rule_id=None,
+        result_data=None,
+    ) -> None:
         pass
-        
+
         self.query_node = query_node
         self.flow_result = flow_result
         self.flow_details = flow_details
@@ -82,16 +81,14 @@ class AcceptResult(object):
 
 
 class DeniedResult(object):
-
-    def __init__(self, 
-
-            query_node=None, 
-            denied=None,
-
-            ) -> None:
+    def __init__(
+        self,
+        query_node=None,
+        denied=None,
+    ) -> None:
         pass
-        
-        self.query_node = query_node  
+
+        self.query_node = query_node
         self.denied = True
 
 
@@ -100,27 +97,29 @@ def main():
 
     ac = AccessCheck()
 
-    
-    results = ac.check(src_ip=src_ip, destination_ip=destination_ip, applications=applications, nodes=nodes, snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
-    
-    all_results = []
+    results = ac.check(
+        src_ip=src_ip,
+        destination_ip=destination_ip,
+        applications=applications,
+        nodes=nodes,
+        snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+    )
 
-    
+    all_results = []
 
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
 
-    #show_all(results)
-    #show_permitted(results)
-    #show_denied(results)
-    #show_permitted_all(all_results)
+    # show_all(results)
+    # show_permitted(results)
+    # show_denied(results)
+    # show_permitted_all(all_results)
 
     result_dict = _build_results_dict(ac)
 
     # build new access_result object
     access_results = _build_access_result(result_dict)
     print(access_results)
-
 
 
 def show_all(results):
@@ -140,7 +139,6 @@ def show_all(results):
             if enum == 5:
                 print(f"TraceTreeList: {e}")
 
-            
 
 def show_permitted(results):
 
@@ -151,7 +149,11 @@ def show_permitted(results):
                 for item in v[5]:
                     for item_child in item.children:
                         for c in item_child.children:
-                            if re.search('permitted', c.traceElement.fragments[0].text, re.IGNORECASE):
+                            if re.search(
+                                "permitted",
+                                c.traceElement.fragments[0].text,
+                                re.IGNORECASE,
+                            ):
                                 for enum, e in enumerate(v):
                                     if enum == 3:
                                         print("========================")
@@ -181,8 +183,12 @@ def show_permitted_all(all_results):
                     for item in v[5]:
                         for item_child in item.children:
                             for c in item_child.children:
-                                if re.search('permitted', c.traceElement.fragments[0].text, re.IGNORECASE):
-                                    hits +=1
+                                if re.search(
+                                    "permitted",
+                                    c.traceElement.fragments[0].text,
+                                    re.IGNORECASE,
+                                ):
+                                    hits += 1
                                     for enum, e in enumerate(v):
                                         if enum == 3:
                                             print("========================")
@@ -201,7 +207,6 @@ def show_permitted_all(all_results):
                                             print("========================")
     if hits == 0:
         print(f"DENIED ON HOST: ")
-
 
 
 def show_denied(results):
@@ -224,15 +229,23 @@ def show_denied(results):
                 if enum == 5:
                     print(f"TraceTreeList: {e}")
 
+
 def _build_results_dict(ac) -> Dict[str, Any]:
 
     results_dict = defaultdict(list)
 
     for node in node_list:
-        result = ac.check(src_ip=src_ip, destination_ip=destination_ip, applications=applications, nodes=node, snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
+        result = ac.check(
+            src_ip=src_ip,
+            destination_ip=destination_ip,
+            applications=applications,
+            nodes=node,
+            snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+        )
         results_dict[node].append(result)
 
     return results_dict
+
 
 def _build_access_result(results_dict) -> AcceptResult:
 
@@ -240,7 +253,6 @@ def _build_access_result(results_dict) -> AcceptResult:
     denied_results = []
 
     for node, result in results_dict.items():
-
 
         for r in result:
 
@@ -253,7 +265,11 @@ def _build_access_result(results_dict) -> AcceptResult:
                         for item in v[5]:
                             for item_child in item.children:
                                 for c in item_child.children:
-                                    if re.search('permitted', c.traceElement.fragments[0].text, re.IGNORECASE):
+                                    if re.search(
+                                        "permitted",
+                                        c.traceElement.fragments[0].text,
+                                        re.IGNORECASE,
+                                    ):
                                         for enum, e in enumerate(v):
                                             if enum == 3:
                                                 print("========================")
@@ -262,26 +278,51 @@ def _build_access_result(results_dict) -> AcceptResult:
                                                 continue
                                             if enum == 0:
                                                 print(f"Node Queried is: {e}")
-                                            
+
                                             if enum == 1:
-                                                print(f"From zone/iface to zone/iface: {e}")
+                                                print(
+                                                    f"From zone/iface to zone/iface: {e}"
+                                                )
                                                 access_result.ingress_egress = e
 
                                                 # split ingress egress string
-                                                ingress_zone, ingress_iface, egress_zone, egress_iface = _split_ingress_egress(access_result.ingress_egress)
-                                                access_result.ingress_zone = ingress_zone
-                                                access_result.ingress_interface = ingress_iface
+                                                (
+                                                    ingress_zone,
+                                                    ingress_iface,
+                                                    egress_zone,
+                                                    egress_iface,
+                                                ) = _split_ingress_egress(
+                                                    access_result.ingress_egress
+                                                )
+                                                access_result.ingress_zone = (
+                                                    ingress_zone
+                                                )
+                                                access_result.ingress_interface = (
+                                                    ingress_iface
+                                                )
                                                 access_result.egress_zone = egress_zone
-                                                access_result.egress_interface = egress_iface
+                                                access_result.egress_interface = (
+                                                    egress_iface
+                                                )
                                             if enum == 2:
                                                 print(f"Flow details: {e}")
                                                 access_result.flow_details = e
                                                 # other details
-                                                access_result.destination_address = access_result.flow_details.dstIp
-                                                access_result.source_address = access_result.flow_details.srcIp
-                                                access_result.service = access_result.flow_details.ipProtocol
-                                                access_result.ingress_node = access_result.flow_details.ingressNode
-                                                access_result.ingress_vrf = access_result.flow_details.ingressVrf
+                                                access_result.destination_address = (
+                                                    access_result.flow_details.dstIp
+                                                )
+                                                access_result.source_address = (
+                                                    access_result.flow_details.srcIp
+                                                )
+                                                access_result.service = (
+                                                    access_result.flow_details.ipProtocol
+                                                )
+                                                access_result.ingress_node = (
+                                                    access_result.flow_details.ingressNode
+                                                )
+                                                access_result.ingress_vrf = (
+                                                    access_result.flow_details.ingressVrf
+                                                )
                                             if enum == 4:
                                                 pass
                                             if enum == 5:
@@ -289,32 +330,31 @@ def _build_access_result(results_dict) -> AcceptResult:
                                                 print("========================")
                                                 access_result.trace_tree_list = e
                                                 # get policy permit details / rule details
-                                                access_result.permit_rule = access_result.trace_tree_list[0].traceElement.fragments[1].text
-                                                access_result.rule_id = access_result.trace_tree_list[0].traceElement.fragments[2].text
+                                                access_result.permit_rule = (
+                                                    access_result.trace_tree_list[0]
+                                                    .traceElement.fragments[1]
+                                                    .text
+                                                )
+                                                access_result.rule_id = (
+                                                    access_result.trace_tree_list[0]
+                                                    .traceElement.fragments[2]
+                                                    .text
+                                                )
 
-                                            
-                    
                     if access_result.flow_result == "PERMIT":
                         access_results.append(access_result)
 
-
                 else:
                     # todo - generate a DENY entry
-                    
+
                     denied_result = DeniedResult()
 
                     denied_result.denied == True
                     denied_result.query_node = node
 
                     denied_results.append(denied_result)
-                
 
     merged_results = [*access_results, *denied_results]
-
-    
-                    
-
-
 
     return merged_results
 
@@ -329,13 +369,6 @@ def _split_ingress_egress(ingress_egress):
     egress_iface = split_list[4]
 
     return ingress_zone, ingress_iface, egress_zone, egress_iface
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":

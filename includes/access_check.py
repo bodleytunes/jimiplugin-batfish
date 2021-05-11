@@ -1,10 +1,17 @@
+from typing import Optional
 from plugins.batfish.includes.batfish import BatFish, BatfishOps
 
 
 class AccessCheck(BatFish):
-
-
-    def __init__(self, ingress=None, src_ip=None, destination_ip=None, applications=None, nodes=None, snapshot_folder=None):
+    def __init__(
+        self,
+        ingress: Optional[str] = None,
+        src_ip: Optional[str] = None,
+        destination_ip: Optional[str] = None,
+        applications: Optional[str] = None,
+        nodes: Optional[str] = None,
+        snapshot_folder: Optional[str] = None,
+    ):
 
         self.src_ip = src_ip
         self.destination_ip = destination_ip
@@ -14,28 +21,25 @@ class AccessCheck(BatFish):
 
         pass
 
-
-    def check(self, ingress=None, src_ip=None, destination_ip=None, applications=None, nodes=None, snapshot_folder=None):
-
-
+    def check(
+        self,
+        ingress=None,
+        src_ip=None,
+        destination_ip=None,
+        applications=None,
+        nodes=None,
+        snapshot_folder=None,
+    ):
 
         b = BatfishOps()
         b.init_batfish(SNAPSHOT_PATH=snapshot_folder)
 
-        
-        flow = b.hc(srcIps=src_ip,
-                     dstIps=destination_ip,
-                     applications=applications)
+        flow = b.hc(srcIps=src_ip, dstIps=destination_ip, applications=applications)
 
-        t = b.bfq.testFilters(headers=flow,
-                         nodes=nodes)
-
-        
-
+        t = b.bfq.testFilters(headers=flow, nodes=nodes)
 
         df = t.answer().frame()
 
         result = df
 
         return result
-
