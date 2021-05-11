@@ -64,6 +64,7 @@ class DeniedResult(object):
 class AccessCheck(BatFish):
     def __init__(
         self,
+        host: Optional[str] = None,
         ingress: Optional[str] = None,
         src_ip: Optional[str] = None,
         destination_ip: Optional[str] = None,
@@ -72,6 +73,7 @@ class AccessCheck(BatFish):
         snapshot_folder: Optional[str] = None,
     ):
 
+        self.host = host
         self.src_ip = src_ip
         self.destination_ip = destination_ip
         self.applications = applications
@@ -97,9 +99,7 @@ class AccessCheck(BatFish):
 
         t = b.bfq.testFilters(headers=flow, nodes=nodes)
 
-        df = t.answer().frame()
-
-        result = df
+        result = t.answer().frame()
 
         return result
 
