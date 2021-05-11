@@ -128,9 +128,11 @@ class AccessCheck(BatFish):
             )
             results_dict[node].append(result)
 
-        return results_dict
+        merged_results = self._build_access_result(results_dict)
 
-    def build_access_result(self, results_dict) -> Union[AcceptResult, DeniedResult]:
+        return merged_results
+
+    def _build_access_result(self, results_dict) -> Union[AcceptResult, DeniedResult]:
 
         access_results = []
         denied_results = []
