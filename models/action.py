@@ -1,83 +1,38 @@
 from core.models import action
 from core import auth, helpers
 
-from plugins.batfish.includes import batfish
+# from plugins.batfish.includes import batfish
+from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.access_check import AccessCheck
-
-
-class _batfish(action._action):
-
-    # Map fields to pluginName.json (creates the flow box in conduct editor)
-
-    src_ip = str()
-    dst_ip = str()
-    dst_port = str()
-    batfish_server = str()
-    batfish_network = str()
-    device_type = str()
-    snapshots_dir = str()
-
-    def doAction(self, data) -> dict:
-
-        # Call helpers to make various pre-checks
-        src_ip = helpers.evalString(self.src_ip, {"data": data["flowData"]})
-        dst_ip = helpers.evalString(self.dst_ip, {"data": data["flowData"]})
-        dst_port = helpers.evalString(self.dst_port, {"data": data["flowData"]})
-        batfish_server = helpers.evalString(
-            self.batfish_server, {"data": data["flowData"]}
-        )
-        batfish_network = helpers.evalString(
-            self.batfish_network, {"data": data["flowData"]}
-        )
-        device_type = helpers.evalString(self.device_type, {"data": data["flowData"]})
-        snapshots_dir = helpers.evalString(
-            self.snapshots_dir, {"data": data["flowData"]}
-        )
-
-        # Call Batfish Includes
-        b = batfish.batfishOps(
-            src_ip,
-            dst_ip,
-            dst_port,
-            batfish_server,
-            batfish_network,
-            device_type,
-            snapshots_dir=snapshots_dir,
-        )
-
-        # Get batfish data
-        data = list([b.return_traceroutes(), b.return_longest_match()])
-
-        # Return results to Jimi flow
-        if len(data) > 0:
-            return {"result": True, "rc": 0, "data": data}
-        else:
-            return {"result": False, "rc": 404}
-
-    def setAttribute(self, attr, value, sessionData=None):
-
-        return super(_batfish, self).setAttribute(attr, value, sessionData=sessionData)
 
 
 class _remoteConnectBatfish(action._action):
     host = str()
-    snapshots_dir = str()
+    snapshot_folder = str()
 
     def doAction(self, data):
         host = helpers.evalString(self.host, {"data": data["flowData"]})
+        """
+        * Instanciate a batfish Batfish().init() object using "batfish host" and "snapshot folder" initial as arguments.
+    
+        Args:
+            data: accepts event data
 
-        # create instance of BatFishOps
-        client = batfish.BatfishOps()
-        client.init_batfish(host, snapshots_dir=self.snapshots_dir)
+            returns: Results and Return codes
+        """
+        # Create instance of batfish
+        b_fish = Batfish()
+        b_fish.init_batfish(host=host, snapshot_folder=self.snapshot_folder)
 
-        if client.client != None:
-            data["eventData"]["batfish"] = {"client": client}
+        if b_fish != None:
+            data["eventData"]["remote"] = {}
+            data["eventData"]["remote"] = {"client": b_fish}
             return {"result": True, "rc": 0, "msg": "Initiated Batfish Session"}
         else:
             return {
                 "result": False,
                 "rc": 403,
-                "msg": "Connection failed - {0}".format(client.error),
+                "msg": "Connection failed - {0}".format("General Protection Fault!"),
             }
 
     def setAttribute(self, attr, value, sessionData=None):
@@ -91,50 +46,79 @@ class _remoteConnectBatfish(action._action):
 
 class _batfishAccessCheck(action._action):
 
+    """
+    * Connect to existing batfish Batfish() object
+    * Create AccessCheck() and pass it the Batfish() client
+
+    Args:
+        * data: event data (flow data)
+    Returns:
+        * data: event data (flow data)
+        * rc: return code
+        * result: result
+        * msg: Message
+    """
+
     # input data
 
     src_ip = str()
     destination_ip = str()
     applications = list()
-    node_list = list()
+    nodes = list()
 
     def doAction(self, data):
-        command = helpers.evalString(self.command, {"data": data["flowData"]})
-        try:
-            client = data["eventData"]["batfish"]["client"]
-        except KeyError:
-            client = None
-        # set dest folder sane defaults
-        if self.dstFolder == None or self.dstFolder == "":
-            self.dstFolder = "/shared/data/storage/firewall-configs/snapshots/configs"
-        if client:
-            ac = AccessCheck()
 
-            exitCode, errors, results = ac.check(
+        try:
+            b_fish = data["eventData"]["remote"]["client"]
+        except KeyError:
+            b_fish = None
+
+        if b_fish:
+
+            # create instance of AccessCheck and pass original batfish object as initial arg
+            ac = AccessCheck(b_fish=b_fish)
+
+            # Make the actual batfish query
+
+            permit_results, deny_results, merged_results = ac.get_results(
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
                 applications=self.applications,
-                nodes=self.node_list,
-                snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+                nodes=self.nodes,
             )
 
-            ac.build_results_dict(ac)
+            # data["eventData"]["remote"]["access_results"] = results
+            data["eventData"]["remote"]["permit_results"] = permit_results
+            # data["eventData"]["remote"]["deny_results"] = deny_results
 
-            if exitCode != None:
+            if (len(data["eventData"]["remote"]["permit_results"])) > 0:
+                exitCode = 0
+            else:
+                exitCode = 255
+
+            if exitCode == 0:
                 return {
                     "result": True,
                     "rc": exitCode,
-                    "msg": "Command succesfull",
-                    "data": "config saved!",
-                    "errors": errors,
+                    "msg": "Query Successful",
+                    "data": data,
+                    "errors": "",
                 }
             else:
                 return {
                     "result": False,
                     "rc": 255,
-                    "msg": client.error,
+                    "msg": "General Protection Fault!",
                     "data": "",
                     "errors": "",
                 }
         else:
             return {"result": False, "rc": 403, "msg": "No connection found"}
+
+    def setAttribute(self, attr, value, sessionData=None):
+        if attr == "password" and not value.startswith("ENC "):
+            self.password = "ENC {0}".format(auth.getENCFromPassword(value))
+            return True
+        return super(_batfishAccessCheck, self).setAttribute(
+            attr, value, sessionData=sessionData
+        )

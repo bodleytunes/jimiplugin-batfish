@@ -27,12 +27,12 @@ destination_ip = "10.3.255.100"
 
 # Services
 # applications =["dns"]
-applications = ["icmp"]
-# applications = ["https"]
+# applications = ["icmp"]
+applications = ["https"]
 
 # Nodes to query
-nodes = "spoke1"
-node_list = ["spoke1", "spoke2"]
+# nodes = ["spoke1"]
+nodes = ["spoke1", "spoke2"]
 
 # OUTPUT OBJECTS
 class AcceptResult(object):
@@ -95,168 +95,174 @@ class DeniedResult(object):
 @pytest.mark.batfish
 def main():
 
-    ac = AccessCheck()
+    """
+    * Initialize AccessCheck Object from access_check.py
+    * run _build_results_dict and pass in AccessCheck() object as arg
+    * inits batfish() object
+    * creates flow from passed in args
+    * Batfish make a Query "testFilters" and pass in "flow" and "nodes" as args
+    * returns resulting answer as a dataframe
+    """
 
-    results = ac.check(
+    ac = AccessCheck(
+        batfish_server="10.12.12.134",
+        snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+    )
+
+    results = ac.get_results(
         src_ip=src_ip,
         destination_ip=destination_ip,
         applications=applications,
         nodes=nodes,
-        snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
     )
 
-    all_results = []
-
-    pd.set_option("max_rows", None)
-    pd.set_option("max_columns", None)
-
-    result_dict = _build_results_dict(ac)
-
-    # build new access_result object
-    access_results = _build_access_result(result_dict)
-    print(access_results)
+    print(results)
 
 
-def _build_results_dict(ac) -> Dict[str, Any]:
+# def get_results(
+#    src_ip=src_ip, destination_ip=destination_ip, applications=applications, nodes=nodes
+# ) -> Dict[str, Any]:
 
-    results_dict = defaultdict(list)
+# results_dict = defaultdict(list)
+#
+# for node in node_list:
+#    result = ac.check(
+#        src_ip=src_ip,
+#        destination_ip=destination_ip,
+#        applications=applications,
+#        nodes=node,
+#        snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+#    )
+#    results_dict[node].append(result)
 
-    for node in node_list:
-        result = ac.check(
-            src_ip=src_ip,
-            destination_ip=destination_ip,
-            applications=applications,
-            nodes=node,
-            snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
-        )
-        results_dict[node].append(result)
-
-    return results_dict
-
-
-def _build_access_result(results_dict) -> Union[AcceptResult, DeniedResult]:
-
-    access_results = []
-    denied_results = []
-
-    for node, result in results_dict.items():
-
-        for r in result:
-
-            for v in r.values:
-                if re.search("permit", v[3], re.IGNORECASE):
-                    access_result = AcceptResult()
-                    access_result.query_node = node
-
-                    if len(v[5]) > 0:
-                        for item in v[5]:
-                            for item_child in item.children:
-                                for c in item_child.children:
-                                    if re.search(
-                                        "permitted",
-                                        c.traceElement.fragments[0].text,
-                                        re.IGNORECASE,
-                                    ):
-                                        for enum, e in enumerate(v):
-                                            if enum == 3:
-                                                print("========================")
-                                                print(f"Flow result : *** {e} ***")
-                                                access_result.flow_result = e
-                                                continue
-                                            if enum == 0:
-                                                print(f"Node Queried is: {e}")
-
-                                            if enum == 1:
-                                                print(
-                                                    f"From zone/iface to zone/iface: {e}"
-                                                )
-                                                access_result.ingress_egress = e
-
-                                                # split ingress egress string
-                                                (
-                                                    ingress_zone,
-                                                    ingress_iface,
-                                                    egress_zone,
-                                                    egress_iface,
-                                                ) = _split_ingress_egress(
-                                                    access_result.ingress_egress
-                                                )
-                                                access_result.ingress_zone = (
-                                                    ingress_zone
-                                                )
-                                                access_result.ingress_interface = (
-                                                    ingress_iface
-                                                )
-                                                access_result.egress_zone = egress_zone
-                                                access_result.egress_interface = (
-                                                    egress_iface
-                                                )
-                                            if enum == 2:
-                                                print(f"Flow details: {e}")
-                                                access_result.flow_details = e
-                                                # other details
-                                                access_result.destination_address = (
-                                                    access_result.flow_details.dstIp
-                                                )
-                                                access_result.source_address = (
-                                                    access_result.flow_details.srcIp
-                                                )
-                                                access_result.service = (
-                                                    access_result.flow_details.ipProtocol
-                                                )
-                                                access_result.ingress_node = (
-                                                    access_result.flow_details.ingressNode
-                                                )
-                                                access_result.ingress_vrf = (
-                                                    access_result.flow_details.ingressVrf
-                                                )
-                                            if enum == 4:
-                                                pass
-                                            if enum == 5:
-                                                print(f"TraceTreeList: {e}")
-                                                print("========================")
-                                                access_result.trace_tree_list = e
-                                                # get policy permit details / rule details
-                                                access_result.permit_rule = (
-                                                    access_result.trace_tree_list[0]
-                                                    .traceElement.fragments[1]
-                                                    .text
-                                                )
-                                                access_result.rule_id = (
-                                                    access_result.trace_tree_list[0]
-                                                    .traceElement.fragments[2]
-                                                    .text
-                                                )
-
-                    if access_result.flow_result == "PERMIT":
-                        access_results.append(access_result)
-
-                else:
-                    # generate a DENY entry
-
-                    denied_result = DeniedResult()
-
-                    denied_result.denied == True
-                    denied_result.query_node = node
-
-                    denied_results.append(denied_result)
-
-    merged_results = [*access_results, *denied_results]
-
-    return merged_results
+#   results_dict = ac.get_results
+#
+#   return results_dict
 
 
-def _split_ingress_egress(ingress_egress):
-
-    split_list = ingress_egress.split("~")
-
-    ingress_zone = split_list[0]
-    ingress_iface = split_list[1]
-    egress_zone = split_list[3]
-    egress_iface = split_list[4]
-
-    return ingress_zone, ingress_iface, egress_zone, egress_iface
-
-
+# def _build_access_result(results_dict) -> Union[AcceptResult, DeniedResult]:
+#
+#    access_results = []
+#    denied_results = []
+#
+#    for node, result in results_dict.items():
+#
+#        for r in result:
+#
+#            for v in r.values:
+#                if re.search("permit", v[3], re.IGNORECASE):
+#                    access_result = AcceptResult()
+#                    access_result.query_node = node
+#
+#                    if len(v[5]) > 0:
+#                        for item in v[5]:
+#                            for item_child in item.children:
+#                                for c in item_child.children:
+#                                    if re.search(
+#                                        "permitted",
+#                                        c.traceElement.fragments[0].text,
+#                                        re.IGNORECASE,
+#                                    ):
+#                                        for enum, e in enumerate(v):
+#                                            if enum == 3:
+#                                                print("========================")
+#                                                print(f"Flow result : *** {e} ***")
+#                                                access_result.flow_result = e
+#                                                continue
+#                                            if enum == 0:
+#                                                print(f"Node Queried is: {e}")
+#
+#                                            if enum == 1:
+#                                                print(
+#                                                    f"From zone/iface to zone/iface: {e}"
+#                                                )
+#                                                access_result.ingress_egress = e
+#
+#                                                # split ingress egress string
+#                                                (
+#                                                    ingress_zone,
+#                                                    ingress_iface,
+#                                                    egress_zone,
+#                                                    egress_iface,
+#                                                ) = _split_ingress_egress(
+#                                                    access_result.ingress_egress
+#                                                )
+#                                                access_result.ingress_zone = (
+#                                                    ingress_zone
+#                                                )
+#                                                access_result.ingress_interface = (
+#                                                    ingress_iface
+#                                                )
+#                                                access_result.egress_zone = egress_zone
+#                                                access_result.egress_interface = (
+#                                                    egress_iface
+#                                                )
+#                                            if enum == 2:
+#                                                print(f"Flow details: {e}")
+#                                                access_result.flow_details = e
+#                                                # other details
+#                                                access_result.destination_address = (
+#                                                    access_result.flow_details.dstIp
+#                                                )
+#                                                access_result.source_address = (
+#                                                    access_result.flow_details.srcIp
+#                                                )
+#                                                access_result.service = (
+#                                                    access_result.flow_details.ipProtocol
+#                                                )
+#                                                access_result.ingress_node = (
+#                                                    access_result.flow_details.ingressNode
+#                                                )
+#                                                access_result.ingress_vrf = (
+#                                                    access_result.flow_details.ingressVrf
+#                                                )
+#                                            if enum == 4:
+#                                                pass
+#                                            if enum == 5:
+#                                                print(f"TraceTreeList: {e}")
+#                                                print("========================")
+#                                                access_result.trace_tree_list = e
+#                                                # get policy permit details / rule details
+#                                                access_result.permit_rule = (
+#                                                    access_result.trace_tree_list[0]
+#                                                    .traceElement.fragments[1]
+#                                                    .text
+#                                                )
+#                                                access_result.rule_id = (
+#                                                    access_result.trace_tree_list[0]
+#                                                    .traceElement.fragments[2]
+#                                                    .text
+#                                                )
+#
+#                    if access_result.flow_result == "PERMIT":
+#                        access_results.append(access_result)
+#
+#                else:
+#                    # generate a DENY entry
+#
+#                    denied_result = DeniedResult()
+#
+#                    denied_result.denied == True
+#                    denied_result.query_node = node
+#
+#                    denied_results.append(denied_result)
+#
+#    merged_results = [*access_results, *denied_results]
+#
+#    return merged_results
+#
+#
+# def _split_ingress_egress(ingress_egress):
+#
+#    split_list = ingress_egress.split("~")
+#
+#    ingress_zone = split_list[0]
+#    ingress_iface = split_list[1]
+#    egress_zone = split_list[3]
+#    egress_iface = split_list[4]
+#
+#    return ingress_zone, ingress_iface, egress_zone, egress_iface
+#
+#
 if __name__ == "__main__":
     main()
