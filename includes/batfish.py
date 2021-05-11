@@ -42,15 +42,15 @@ class BatFish:
 
 class BatfishOps:
     def __init__(
-        self, NETWORK_NAME=None, BATFISH_SERVER=None, SNAPSHOT_PATH=None
+        self, NETWORK_NAME=None, BATFISH_SERVER=None, snapshot_folder=None
     ) -> None:
         self.NETWORK_NAME = "Firewalls"
         self.BATFISH_SERVER = "10.12.12.134"
-        self.SNAPSHOT_PATH = SNAPSHOT_PATH
+        self.snapshot_folder = snapshot_folder
 
         # self.init_batfish()
 
-    def init_batfish(self, BATFISH_SERVER=None, SNAPSHOT_PATH=None):
+    def init_batfish(self, BATFISH_SERVER=None, snapshot_folder=None):
 
         bf_session.host = self.BATFISH_SERVER
         bf_session.coordinatorHost = self.BATFISH_SERVER
@@ -58,7 +58,7 @@ class BatfishOps:
         bf_set_network(self.NETWORK_NAME)
 
         # Initialize Batfish Snapshot
-        bf_init_snapshot(SNAPSHOT_PATH, name=self.NETWORK_NAME, overwrite=True)
+        bf_init_snapshot(snapshot_folder, name=self.NETWORK_NAME, overwrite=True)
         # Generate Dataplane
         bf_generate_dataplane()
         # Load Batfish Questions

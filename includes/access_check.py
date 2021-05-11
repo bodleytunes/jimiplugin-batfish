@@ -91,7 +91,7 @@ class AccessCheck(BatFish):
     ):
 
         b = BatfishOps()
-        b.init_batfish(SNAPSHOT_PATH=snapshot_folder)
+        b.init_batfish(snapshot_folder=snapshot_folder)
 
         flow = b.hc(srcIps=src_ip, dstIps=destination_ip, applications=applications)
 
