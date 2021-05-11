@@ -143,7 +143,7 @@ class _batfishAccessCheck(action._action):
                 return {
                     "result": False,
                     "rc": 255,
-                    "msg": "General Protection Error!",
+                    "msg": "General Protection Fault!",
                     "data": "",
                     "errors": "",
                 }
