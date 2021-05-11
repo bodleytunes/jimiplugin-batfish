@@ -37,7 +37,6 @@ class BatFish:
 
         self.dest_dir = str()
         # self.snapshot_folder = os.path.join(self.ROOT_DIR, "snapshots")
-        # self.snapshot_folder = "/shared/data/storage/firewall-configs/snapshot"
 
 
 class BatfishOps:

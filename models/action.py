@@ -70,7 +70,7 @@ class _remoteConnectBatfish(action._action):
         client = batfish.BatfishOps()
         client.init_batfish(host, snapshot_folder=self.snapshot_folder)
 
-        if client.client != None:
+        if client != None:
             data["eventData"]["batfish"] = {"client": client}
             return {"result": True, "rc": 0, "msg": "Initiated Batfish Session"}
         else:
