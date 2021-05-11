@@ -32,13 +32,18 @@ class AcceptResult(object):
 
             query_node=None, 
             flow_result=None,
-            denied=None,
             flow_details=None,
             trace_tree_list=None,
             ingress_egress=None,
+            ingress_interface=None,
+            ingress_vrf=None,
+            ingress_node=None,
             source_address=None,
             destination_address=None,
             service=None,
+            ip_protocol=None,
+            permit_rule=None,
+            rule_id=None,
             result_data=None
 
 
@@ -47,13 +52,18 @@ class AcceptResult(object):
         
         self.query_node = query_node
         self.flow_result = flow_result
-        self.denied = True
         self.flow_details = flow_details
         self.trace_tree_list = trace_tree_list
         self.ingress_egress = ingress_egress
+        self.ingress_interface = ingress_interface
+        self.ingress_vrf = ingress_vrf
+        self.ingress_node = ingress_node
         self.source_address = source_address
         self.destination_address = destination_address
         self.service = service
+        self.ip_protocol = ip_protocol
+        self.permit_rule = permit_rule
+        self.rule_id = rule_id
 
         self.result_data = result_data
 
@@ -246,15 +256,25 @@ def _build_access_result(results_dict) -> AcceptResult:
                                             if enum == 2:
                                                 print(f"Flow details: {e}")
                                                 access_result.flow_details = e
+                                                # other details
+                                                access_result.destination_address = access_result.flow_details.dstIp
+                                                access_result.source_address = access_result.flow_details.srcIp
+                                                access_result.service = access_result.flow_details.ipProtocol
+                                                access_result.ingress_node = access_result.flow_details.ingressNode
+                                                access_result.ingress_vrf = access_result.ingress_vrf
                                             if enum == 4:
                                                 pass
                                             if enum == 5:
                                                 print(f"TraceTreeList: {e}")
                                                 print("========================")
                                                 access_result.trace_tree_list = e
+                                                # get policy permit details / rule details
+                                                access_result.permit_rule = access_result.trace_tree_list[0].traceElement.fragments[1].text
+                                                access_result.rule_id = access_result.trace_tree_list[0].traceElement.fragments[2].text
+
+                                            
                     
                     if access_result.flow_result == "PERMIT":
-                        access_result.denied == False
                         access_results.append(access_result)
 
 
@@ -268,9 +288,7 @@ def _build_access_result(results_dict) -> AcceptResult:
 
                     denied_results.append(denied_result)
                 
-                #denied_list_condensed = [d for d in denied_results if d.denied == True]
 
-    #merged_set = set(i.query_node for i in denied_list_condensed)
     merged_results = [*access_results, *denied_results]
 
     
