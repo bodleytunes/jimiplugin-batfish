@@ -243,7 +243,10 @@ class AccessCheck(BatFish):
 
         merged_results = [*access_results, *denied_results]
 
-        return merged_results
+        permit_results = [obj.__dict__ for obj in access_results]
+        deny_results = [obj.__dict__ for obj in denied_results]
+
+        return permit_results, deny_results, merged_results
 
     def _split_ingress_egress(self, ingress_egress):
 
