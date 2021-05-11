@@ -101,8 +101,6 @@ class AccessCheck(BatFish):
 
         result = t.answer().frame()
 
-        return result
-
     def build_results_dict(self) -> Dict[str, Any]:
 
         results_dict = defaultdict(list)

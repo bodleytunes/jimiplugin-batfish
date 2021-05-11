@@ -67,10 +67,14 @@ class _remoteConnectBatfish(action._action):
         host = helpers.evalString(self.host, {"data": data["flowData"]})
 
         # create instance of AccessCheck which will then init BatFishOps
-        client = AccessCheck(host=host)
-
-        # initialize batfish and pass it some initial data to populate the fields
-        client.check(host, snapshot_folder=self.snapshot_folder)
+        client = AccessCheck(
+            host=host,
+            snapshot_folder=self.snapshot_folder,
+            src_ip=self.src_ip,
+            destination_ip=self.destination_ip,
+            applications=self.applications,
+            nodes=self.node_list,
+        )
 
         if client != None:
             data["eventData"]["batfish"] = {"client": client}
@@ -109,13 +113,7 @@ class _batfishAccessCheck(action._action):
         if client:
 
             # Make the actual batfish query
-            exitCode, errors, results = client.build_results_dict(
-                src_ip=self.src_ip,
-                destination_ip=self.destination_ip,
-                applications=self.applications,
-                nodes=self.node_list,
-                snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
-            )
+            exitCode, errors, results = client.build_results_dict()
 
             data["eventData"]["batfish"]["access_results"] = results
 
