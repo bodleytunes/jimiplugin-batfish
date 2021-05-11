@@ -1,6 +1,11 @@
 import os
 
-from pybatfish.client.commands import bf_generate_dataplane, bf_session, bf_init_snapshot, bf_set_network
+from pybatfish.client.commands import (
+    bf_generate_dataplane,
+    bf_session,
+    bf_init_snapshot,
+    bf_set_network,
+)
 from pybatfish.question import bfq
 from pybatfish.question.question import load_questions
 from pybatfish.datamodel.flow import HeaderConstraints, PathConstraints
@@ -15,7 +20,7 @@ class BatFish:
         device_type: str,
         batfish_server: str,
         batfish_network: str,
-        snapshots_dir=None
+        snapshots_dir=None,
     ) -> None:
 
         self.ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -31,28 +36,8 @@ class BatFish:
         self.device_type = "FIREWALL"
 
         self.dest_dir = str()
-        #self.snapshots_dir = os.path.join(self.ROOT_DIR, "snapshots")
+        # self.snapshots_dir = os.path.join(self.ROOT_DIR, "snapshots")
         self.snapshots_dir = "/shared/data/storage/firewall-configs/snapshot"
-
-
-
-    def return_traceroutes(self):
-
-        # batfish queries
-        bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
-        answers = bat_ops.question_routing_traceroute(
-            self.src_ip, self.dst_ip, self.dst_port
-        )
-
-        return answers
-
-    def return_longest_match(self):
-
-        bat_ops = BatfishOps(SNAPSHOT_PATH=self.snapshots_dir)
-        answers = bat_ops.question_routing_lm(self.src_ip, self.dst_ip)
-
-        return answers
-
 
 
 class BatfishOps:
@@ -63,9 +48,7 @@ class BatfishOps:
         self.BATFISH_SERVER = "10.12.12.134"
         self.SNAPSHOT_PATH = SNAPSHOT_PATH
 
-        #self.init_batfish()
-
-        
+        # self.init_batfish()
 
     def init_batfish(self, BATFISH_SERVER=None, SNAPSHOT_PATH=None):
 
@@ -96,7 +79,6 @@ class BatfishOps:
 
         if dst_port is not None:
 
-
             properties = bfq.nodeProperties().answer().frame()
             print(properties)
 
@@ -105,9 +87,7 @@ class BatfishOps:
             ip_owners = bfq.ipOwners().answer().frame()
             print(ip_owners)
 
-            #t = bfq.traceroute(startLocation="fortigate-vm64-kvm", headers=HeaderConstraints(dstIps=dst_ip, dstPorts=dst_port_list)).answer().frame()
-
-
+            # t = bfq.traceroute(startLocation="fortigate-vm64-kvm", headers=HeaderConstraints(dstIps=dst_ip, dstPorts=dst_port_list)).answer().frame()
 
             for device in node_list:
 
@@ -155,4 +135,3 @@ class BatfishOps:
             node_list.append(node)
 
         return node_list
-
