@@ -118,7 +118,8 @@ class _batfishAccessCheck(action._action):
                 nodes=self.nodes,
             )
 
-            data["eventData"]["batfish"]["access_results"] = results
+            # !todo use __dict__ ?
+            data["eventData"]["remote"]["access_results"] = results
 
             if len(data) > 0:
                 exitCode = 0
