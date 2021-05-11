@@ -42,8 +42,10 @@ class AcceptResult(object):
             flow_details=None,
             trace_tree_list=None,
             ingress_egress=None,
+            ingress_zone=None,
             ingress_interface=None,
             egress_interface=None,
+            egress_zone=None,
             ingress_vrf=None,
             ingress_node=None,
             source_address=None,
@@ -63,8 +65,10 @@ class AcceptResult(object):
         self.flow_details = flow_details
         self.trace_tree_list = trace_tree_list
         self.ingress_egress = ingress_egress
+        self.ingress_zone = ingress_zone
         self.ingress_interface = ingress_interface
         self.egress_interface = egress_interface
+        self.egress_zone = egress_zone
         self.ingress_vrf = ingress_vrf
         self.ingress_node = ingress_node
         self.source_address = source_address
@@ -262,6 +266,13 @@ def _build_access_result(results_dict) -> AcceptResult:
                                             if enum == 1:
                                                 print(f"From zone/iface to zone/iface: {e}")
                                                 access_result.ingress_egress = e
+
+                                                # split ingress egress string
+                                                ingress_zone, ingress_iface, egress_zone, egress_iface = _split_ingress_egress(access_result.ingress_egress)
+                                                access_result.ingress_zone = ingress_zone
+                                                access_result.ingress_interface = ingress_iface
+                                                access_result.egress_zone = egress_zone
+                                                access_result.egress_interface = egress_iface
                                             if enum == 2:
                                                 print(f"Flow details: {e}")
                                                 access_result.flow_details = e
@@ -270,7 +281,7 @@ def _build_access_result(results_dict) -> AcceptResult:
                                                 access_result.source_address = access_result.flow_details.srcIp
                                                 access_result.service = access_result.flow_details.ipProtocol
                                                 access_result.ingress_node = access_result.flow_details.ingressNode
-                                                access_result.ingress_vrf = access_result.ingress_vrf
+                                                access_result.ingress_vrf = access_result.flow_details.ingressVrf
                                             if enum == 4:
                                                 pass
                                             if enum == 5:
@@ -306,6 +317,19 @@ def _build_access_result(results_dict) -> AcceptResult:
 
 
     return merged_results
+
+
+def _split_ingress_egress(ingress_egress):
+
+    split_list = ingress_egress.split("~")
+
+    ingress_zone = split_list[0]
+    ingress_iface = split_list[1]
+    egress_zone = split_list[3]
+    egress_iface = split_list[4]
+
+    return ingress_zone, ingress_iface, egress_zone, egress_iface
+
 
 
 
