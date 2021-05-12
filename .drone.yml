@@ -14,3 +14,5 @@ steps:
       script:
         - cd /gv1/jimi/plugins/batfish
         - git pull
+        - kubectl rollout restart deployment/jimi-core -n jimi
+        - kubectl rollout restart deployment/jimi-web -n jimi
