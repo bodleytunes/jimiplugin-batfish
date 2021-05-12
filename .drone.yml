@@ -1,0 +1,16 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: ssh commands
+    image: appleboy/drone-ssh
+    settings:
+      host: kube2.wizznet.co.uk
+      username: wizznetadmin
+      password:
+        from_secret: wizznetadmin_password
+      port: 22
+      script:
+        - echo hello
+        - echo world
