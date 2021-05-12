@@ -3,13 +3,13 @@ type: docker
 name: default
 
 steps:
-  - name: ssh commands
+  - name: ssh
     image: appleboy/drone-ssh
     settings:
       host: 10.101.0.100
-      username: wizznetadmin
-      password:
-        from_secret: wizznetadmin_password
+      username: root
+      key:
+        from_secret: ssh_key
       port: 22
       script:
         - echo hello
