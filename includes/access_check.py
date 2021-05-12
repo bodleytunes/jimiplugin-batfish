@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, Union, List
 import re
-from plugins.batfish.includes.batfish import BatFish, BatfishOps
+from plugins.batfish.includes.batfish import Batfish
 from collections import defaultdict
 
 
@@ -61,7 +61,7 @@ class DeniedResult(object):
         self.denied = True
 
 
-class AccessCheck(BatFish):
+class AccessCheck(Batfish):
     def __init__(
         self,
         batfish_server: Optional[str] = None,
@@ -72,6 +72,7 @@ class AccessCheck(BatFish):
         applications: Optional[str] = None,
         nodes: Optional[str] = None,
         snapshot_folder: Optional[str] = None,
+        b_fish=None,
     ):
 
         self.batfish_server = batfish_server
@@ -81,6 +82,9 @@ class AccessCheck(BatFish):
         self.applications = applications
         self.snapshot_folder = snapshot_folder
         self.nodes = "hub2"
+
+        # Instance of batfish object
+        self.b_fish = b_fish
 
         pass
 
@@ -94,16 +98,18 @@ class AccessCheck(BatFish):
         snapshot_folder=None,
     ):
 
-        b = BatfishOps()
-        b.init_batfish(
-            BATFISH_SERVER=self.batfish_server, snapshot_folder=self.snapshot_folder
+        # b_fish = Batfish()
+        # b_fish.init_batfish(
+        #    BATFISH_SERVER=self.batfish_server, snapshot_folder=self.snapshot_folder
+        # )
+
+        flow = self.b_fish.hc(
+            srcIps=src_ip, dstIps=destination_ip, applications=applications
         )
 
-        flow = b.hc(srcIps=src_ip, dstIps=destination_ip, applications=applications)
+        query = self.b_fish.bfq.testFilters(headers=flow, nodes=nodes)
 
-        t = b.bfq.testFilters(headers=flow, nodes=nodes)
-
-        result = t.answer().frame()
+        result = query.answer().frame()
 
         return result
 
