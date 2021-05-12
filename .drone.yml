@@ -6,7 +6,7 @@ steps:
   - name: ssh commands
     image: appleboy/drone-ssh
     settings:
-      host: kube2.wizznet.co.uk
+      host: 10.101.0.100
       username: wizznetadmin
       password:
         from_secret: wizznetadmin_password
