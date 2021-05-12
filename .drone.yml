@@ -12,5 +12,5 @@ steps:
         from_secret: ssh_key
       port: 22
       script:
-        - echo hello
-        - echo world
+        - cd /gv1/jimi/plugins/batfish
+        - git pull
