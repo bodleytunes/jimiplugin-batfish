@@ -29,6 +29,7 @@ destination_ip = "10.3.255.100"
 # applications =["dns"]
 # applications = ["icmp"]
 applications = ["https"]
+dst_ports = ["80"]
 
 # Nodes to query
 # nodes = ["spoke1"]
@@ -113,6 +114,7 @@ def main():
         src_ip=src_ip,
         destination_ip=destination_ip,
         applications=applications,
+        dst_ports=dst_ports,
         nodes=nodes,
     )
 

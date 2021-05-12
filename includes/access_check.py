@@ -70,6 +70,7 @@ class AccessCheck(Batfish):
         src_ip: Optional[str] = None,
         destination_ip: Optional[str] = None,
         applications: Optional[str] = None,
+        dst_ports: Optional[str] = None,
         nodes: Optional[str] = None,
         snapshot_folder: Optional[str] = None,
         b_fish=None,
@@ -80,6 +81,7 @@ class AccessCheck(Batfish):
         self.src_ip = src_ip
         self.destination_ip = destination_ip
         self.applications = applications
+        self.dst_ports = dst_ports
         self.snapshot_folder = snapshot_folder
         self.nodes = "hub2"
 
@@ -94,17 +96,16 @@ class AccessCheck(Batfish):
         src_ip=None,
         destination_ip=None,
         applications=None,
+        dst_ports=None,
         nodes=None,
         snapshot_folder=None,
     ):
 
-        # b_fish = Batfish()
-        # b_fish.init_batfish(
-        #    BATFISH_SERVER=self.batfish_server, snapshot_folder=self.snapshot_folder
-        # )
-
         flow = self.b_fish.hc(
-            srcIps=src_ip, dstIps=destination_ip, applications=applications
+            srcIps=src_ip,
+            dstIps=destination_ip,
+            applications=applications,
+            dstPorts=dst_ports,
         )
 
         query = self.b_fish.bfq.testFilters(headers=flow, nodes=nodes)
@@ -114,12 +115,18 @@ class AccessCheck(Batfish):
         return result
 
     def get_results(
-        self, src_ip=None, destination_ip=None, applications=None, nodes=None
+        self,
+        src_ip=None,
+        destination_ip=None,
+        applications=None,
+        dst_ports=None,
+        nodes=None,
     ) -> Dict[str, Any]:
 
         self.src_ip = src_ip
         self.destination_ip = destination_ip
         self.applications = applications
+        self.dst_ports = dst_ports
         self.nodes = nodes
 
         results_dict = defaultdict(list)
@@ -129,6 +136,7 @@ class AccessCheck(Batfish):
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
                 applications=self.applications,
+                dst_ports=self.dst_ports,
                 nodes=node,
                 snapshot_folder=self.snapshot_folder,
             )
