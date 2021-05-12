@@ -39,7 +39,7 @@ class _batfish(plugin._plugin):
         return True
 
     def upgrade(self, LatestPluginVersion):
-        version = 1.4
+
         if self.version < 1.3:
             model.registerModel(
                 "batfishAccessCheck",
