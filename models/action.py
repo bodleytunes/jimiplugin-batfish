@@ -64,6 +64,7 @@ class _batfishAccessCheck(action._action):
     destination_ip = str()
     applications = list()
     dst_ports = list()
+    ip_protocols = list()
     nodes = list()
 
     def doAction(self, data):
@@ -85,6 +86,7 @@ class _batfishAccessCheck(action._action):
                 destination_ip=self.destination_ip,
                 applications=self.applications,
                 dst_ports=self.dst_ports,
+                ip_protocols=self.ip_protocols,
                 nodes=self.nodes,
             )
 

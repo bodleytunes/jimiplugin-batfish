@@ -2,7 +2,7 @@ from core import plugin, model
 
 
 class _batfish(plugin._plugin):
-    version = 1.5
+    version = 1.6
 
     def install(self):
         # Register batfish Models
@@ -48,7 +48,7 @@ class _batfish(plugin._plugin):
                 "plugins.batfish.models.action",
             )
 
-        if self.version < 1.5:
+        if self.version < 1.6:
             model.registerModel(
                 "batfishConnect",
                 "_batfishConnect",

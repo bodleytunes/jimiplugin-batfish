@@ -71,6 +71,7 @@ class AccessCheck(Batfish):
         destination_ip: Optional[str] = None,
         applications: Optional[str] = None,
         dst_ports: Optional[str] = None,
+        ip_protocols: Optional[list] = None,
         nodes: Optional[str] = None,
         snapshot_folder: Optional[str] = None,
         b_fish=None,
@@ -82,6 +83,7 @@ class AccessCheck(Batfish):
         self.destination_ip = destination_ip
         self.applications = applications
         self.dst_ports = dst_ports
+        self.ip_protocols = ip_protocols
         self.snapshot_folder = snapshot_folder
         self.nodes = "hub2"
 
@@ -97,16 +99,27 @@ class AccessCheck(Batfish):
         destination_ip=None,
         applications=None,
         dst_ports=None,
+        ip_protocols=None,
         nodes=None,
         snapshot_folder=None,
     ):
 
-        flow = self.b_fish.hc(
-            srcIps=src_ip,
-            dstIps=destination_ip,
-            applications=applications,
-            dstPorts=dst_ports,
-        )
+        if applications is not None:
+
+            flow = self.b_fish.hc(
+                srcIps=src_ip,
+                dstIps=destination_ip,
+                applications=self._filter_text(applications),
+            )
+
+        elif dst_ports is not None:
+
+            flow = self.b_fish.hc(
+                srcIps=src_ip,
+                dstIps=destination_ip,
+                dstPorts=self._filter_text(dst_ports),
+                ipProtocols=self._make_upper(ip_protocols),
+            )
 
         query = self.b_fish.bfq.testFilters(headers=flow, nodes=nodes)
 
@@ -120,6 +133,7 @@ class AccessCheck(Batfish):
         destination_ip=None,
         applications=None,
         dst_ports=None,
+        ip_protocols=None,
         nodes=None,
     ) -> Dict[str, Any]:
 
@@ -127,19 +141,33 @@ class AccessCheck(Batfish):
         self.destination_ip = destination_ip
         self.applications = applications
         self.dst_ports = dst_ports
+        self.ip_protocols = ip_protocols
         self.nodes = nodes
 
         results_dict = defaultdict(list)
 
         for node in self.nodes:
-            result = self.check(
-                src_ip=self.src_ip,
-                destination_ip=self.destination_ip,
-                applications=self.applications,
-                dst_ports=self.dst_ports,
-                nodes=node,
-                snapshot_folder=self.snapshot_folder,
-            )
+
+            if self.applications:
+
+                result = self.check(
+                    src_ip=self.src_ip,
+                    destination_ip=self.destination_ip,
+                    applications=self.applications,
+                    nodes=node,
+                    snapshot_folder=self.snapshot_folder,
+                )
+            elif self.dst_ports:
+
+                result = self.check(
+                    src_ip=self.src_ip,
+                    destination_ip=self.destination_ip,
+                    dst_ports=self.dst_ports,
+                    ip_protocols=self.ip_protocols,
+                    nodes=node,
+                    snapshot_folder=self.snapshot_folder,
+                )
+
             results_dict[node].append(result)
 
         merged_results = self._build_access_result(results_dict)
@@ -268,3 +296,18 @@ class AccessCheck(Batfish):
         egress_iface = split_list[4]
 
         return ingress_zone, ingress_iface, egress_zone, egress_iface
+
+    def _filter_text(self, arg):
+        # filter empty "" or ''
+        if arg:
+            converter = lambda i: i or None
+            result = [converter(i) for i in arg]
+            return result
+        return
+
+    def _make_upper(self, arg):
+        #  make protocols uppercase
+        if arg:
+            result = [x.upper() for x in arg]
+            return result
+        return
