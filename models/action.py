@@ -6,7 +6,7 @@ from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.access_check import AccessCheck
 
 
-class _remoteConnectBatfish(action._action):
+class _batfishConnect(action._action):
     host = str()
     snapshot_folder = str()
 
@@ -39,7 +39,7 @@ class _remoteConnectBatfish(action._action):
         if attr == "password" and not value.startswith("ENC "):
             self.password = "ENC {0}".format(auth.getENCFromPassword(value))
             return True
-        return super(_remoteConnectBatfish, self).setAttribute(
+        return super(_batfishConnect, self).setAttribute(
             attr, value, sessionData=sessionData
         )
 

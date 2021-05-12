@@ -8,8 +8,8 @@ class _batfish(plugin._plugin):
         # Register batfish Models
 
         model.registerModel(
-            "remoteConnectBatfish",
-            "_remoteConnectBatfish",
+            "batfishConnect",
+            "_batfishConnect",
             "_action",
             "plugins.batfish.models.action",
         )
@@ -25,8 +25,8 @@ class _batfish(plugin._plugin):
         # de-register batfish Models
 
         model.deregisterModel(
-            "remoteConnectBatfish",
-            "_remoteConnectBatfish",
+            "batfishConnect",
+            "_batfishConnect",
             "_action",
             "plugins.batfish.models.action",
         )
@@ -49,8 +49,8 @@ class _batfish(plugin._plugin):
             )
         if self.version < 1.4:
             model.registerModel(
-                "remoteConnectBatfish",
-                "_remoteConnectBatfish",
+                "batfishConnect",
+                "_batfishConnect",
                 "_action",
                 "plugins.batfish.models.action",
             )
