@@ -16,8 +16,7 @@ class _batfishConnect(action._action):
         * Instanciate a batfish Batfish().init() object using "batfish host" and "snapshot folder" initial as arguments.
     
         Args:
-            data: accepts event data
-
+            data: accepts event/flow data
             returns: Results and Return codes
         """
         # Create instance of batfish
