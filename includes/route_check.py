@@ -31,7 +31,8 @@ class RouteCheck(Batfish):
         t = self.b_fish.bfq.traceroute(
             startLocation=ingress, headers=self.b_fish.hc(dstIps=destination_ip)
         )
-        # %%
+
+        #! todo - return useful structured data into a datastructure / object
         result = t.answer().frame()
 
         return result

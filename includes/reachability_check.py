@@ -46,6 +46,8 @@ class ReachabilityCheck(Batfish):
                 dstPorts=self.dstPorts,
             ),
         )
+
+        #! todo - return useful structured data into a datastructure / object
         result = t.answer().frame()
 
         return result

@@ -250,8 +250,6 @@ class AccessCheck(Batfish):
                                                 if enum == 4:
                                                     pass
                                                 if enum == 5:
-                                                    print(f"TraceTreeList: {e}")
-                                                    print("========================")
                                                     access_result.trace_tree_list = e
                                                     # get policy permit details / rule details
                                                     access_result.permit_rule = (
@@ -278,7 +276,21 @@ class AccessCheck(Batfish):
 
                         denied_results.append(denied_result)
 
+        # then whittle all denied results down to only one per query node
         merged_results = [*access_results, *denied_results]
+        # if entry in access results then remove all from denied
+        traffic_denied_hosts = self._remove_denied(access_results, denied_results)
+        traffic_denied_hosts = self._remove_dupes(traffic_denied_hosts)
+
+        # empty denied results list
+        denied_results.clear()
+        # create a new unique list of denied results
+        for i in traffic_denied_hosts:
+            for item in list(i):
+                denied_result = DeniedResult()
+                denied_result.query_node = item
+                denied_result.denied == True
+                denied_results.append(denied_result)
 
         permit_results = [obj.__dict__ for obj in access_results]
         deny_results = [obj.__dict__ for obj in denied_results]
@@ -296,7 +308,29 @@ class AccessCheck(Batfish):
 
         return ingress_zone, ingress_iface, egress_zone, egress_iface
 
-    def _filter_text(self, arg):
+    def _remove_denied(self, access_results, denied_results) -> List[DeniedResult]:
+        # remove denied entries
+        for a in access_results:
+            # iterate over copy as don't delete from list while iterating
+            for d in list(denied_results):
+                if d.query_node == a.query_node:
+                    # remove this denied entry
+                    denied_results.remove(d)
+
+        # print(denied_results)
+        return denied_results
+
+    def _remove_dupes(self, denied_results) -> list:
+
+        # make unique/remove repeated denies/duplicate nodes
+        denied_hosts_list = [d.query_node for d in denied_results]
+        unique_denied_hosts_list = set(denied_hosts_list)
+        # to list
+        traffic_denied_hosts = [unique_denied_hosts_list]
+
+        return traffic_denied_hosts
+
+    def _filter_text(self, arg) -> str:
         # filter empty "" or ''
         if arg:
             converter = lambda i: i or None
@@ -304,7 +338,7 @@ class AccessCheck(Batfish):
             return result
         return
 
-    def _make_upper(self, arg):
+    def _make_upper(self, arg) -> str:
         #  make protocols uppercase
         if arg:
             result = [x.upper() for x in arg]
