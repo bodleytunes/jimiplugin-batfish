@@ -243,13 +243,12 @@ class _batfishReachabilityCheck(action._action):
                 b_fish=b_fish,
                 start_node=self.start_node,
                 start_interface=self.start_interface,
+                destination_ip=self.destination_ip,
             )
 
             # Make the actual batfish query
 
-            results = rc.check(
-                destination_ip=self.destination_ip,
-            )
+            results = rc.check()
 
             data["eventData"]["remote"]["rc_results"] = results
 

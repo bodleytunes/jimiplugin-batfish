@@ -35,6 +35,3 @@ class RouteCheck(Batfish):
         result = t.answer().frame()
 
         return result
-
-
-# %%

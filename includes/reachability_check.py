@@ -9,7 +9,8 @@ class ReachabilityCheck(Batfish):
         source_ip=None,
         applications=None,
         dst_ports=None,
-        start_location=None,
+        start_node=None,
+        start_interface=None,
         b_fish=None,
     ):
 
@@ -17,7 +18,8 @@ class ReachabilityCheck(Batfish):
         self.dstIps = destination_ip
         self.applications = applications
         self.dstPorts = dst_ports
-        self.start = start_location
+        self.start = start_node
+        self.start_interface = start_interface
 
         self.b_fish = b_fish
 
@@ -32,16 +34,16 @@ class ReachabilityCheck(Batfish):
         dstIps=None,
         applications=None,
         dst_ports=None,
-        start_location=None,
+        start_node=None,
     ):
 
         t = self.b_fish.bfq.reachability(
-            pathConstraints=self.b_fish.pc(startLocation=start_location),
+            pathConstraints=self.b_fish.pc(startLocation=self.start),
             headers=self.b_fish.hc(
                 srcIps=self.srcIps,
                 dstIps=self.dstIps,
                 applications=self.applications,
-                dstPorts=self.dst_ports,
+                dstPorts=self.dstPorts,
             ),
         )
         result = t.answer().frame()
