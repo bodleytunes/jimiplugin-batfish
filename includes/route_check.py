@@ -26,11 +26,15 @@ class RouteCheck(Batfish):
         if ingress is not None:
             self.ingress = ingress
         else:
-            ingress == self.ingress
+            ingress = self.ingress
 
         t = self.b_fish.bfq.traceroute(
             startLocation=ingress, headers=self.b_fish.hc(dstIps=destination_ip)
         )
+        # %%
         result = t.answer().frame()
 
         return result
+
+
+# %%

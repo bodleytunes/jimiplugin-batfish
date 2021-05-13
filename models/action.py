@@ -146,6 +146,7 @@ class _batfishRouteCheck(action._action):
 
     # input data
 
+    src_ip = str()
     start_node = str()
     start_interface = str()
     destination_ip = str()
@@ -160,17 +161,16 @@ class _batfishRouteCheck(action._action):
         if b_fish:
 
             # create instance of AccessCheck and pass original batfish object as initial arg
-            rc = RouteCheck(b_fish=b_fish)
+            rc = RouteCheck(
+                b_fish=b_fish,
+                start_node=self.start_node,
+                start_interface=self.start_interface,
+            )
 
             # Make the actual batfish query
 
             results = rc.check(
-                src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
-                applications=self.applications,
-                dst_ports=self.dst_ports,
-                ip_protocols=self.ip_protocols,
-                nodes=self.nodes,
             )
 
             data["eventData"]["remote"]["rc_results"] = results
