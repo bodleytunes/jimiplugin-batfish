@@ -1,24 +1,20 @@
-from plugins.batfish.includes.batfish import BatFish, BatfishOps
+from plugins.batfish.includes.batfish import Batfish
 
 
-class NodeProperties(BatFish):
-
-
+class NodeProperties(Batfish):
     def __init__(self):
         pass
 
-
     def check_node_properties(self, snapshot_folder=None):
 
-        b = BatfishOps()
+        b = Batfish()
         b.init_batfish(SNAPSHOT_PATH=snapshot_folder)
 
-        #print(b.bfq)
+        # print(b.bfq)
         r = b.bfq.nodeProperties()
-        
+
         df = r.answer().frame()
 
         result = df
 
         return result
-

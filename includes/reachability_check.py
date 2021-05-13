@@ -1,4 +1,4 @@
-from plugins.batfish.includes.batfish import Batfish, BatfishOps
+from plugins.batfish.includes.batfish import Batfish
 
 
 class ReachabilityCheck(Batfish):
