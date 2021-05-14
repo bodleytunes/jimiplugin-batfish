@@ -1,4 +1,3 @@
-
 # Fudge the python path
 import sys
 import os
@@ -7,15 +6,44 @@ import pandas as pd
 import pytest
 
 
-PACKAGE_PARENT = '../../../'
-SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+PACKAGE_PARENT = "../../../"
+SCRIPT_DIR = os.path.dirname(
+    os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__)))
+)
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 # end fudge python path
 
 from plugins.batfish.includes.reachability_check import ReachabilityCheck
+from plugins.batfish.includes.batfish import Batfish
+
+
+class ReachabilityResult:
+    def __init__(
+        self,
+    ):
+        self.flow_result: FlowResult = None
+
+        pass
+
+
+class FlowResult(ReachabilityResult):
+    def __init__(
+        self,
+        src_ip=None,
+        dst_ip=None,
+        ip_protocol=None,
+        ingress_node=None,
+        ingress_vrf=None,
+    ):
+
+        self.src_ip = src_ip
+
+
+# class TraceResult(ReachabilityResult):
+
 
 start_location = "spoke1"
-destination_ip = "8.8.8.8"
+destination_ip = "172.16.4.2"
 
 
 @pytest.mark.batfish
@@ -24,14 +52,22 @@ def main():
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
 
-    rc = ReachabilityCheck()
-    
-    result = rc.check(start_location=start_location, destination_ip=destination_ip, snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
+    b = Batfish()
+
+    b.init_batfish(
+        snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+    )
+
+    rc = ReachabilityCheck(b_fish=b)
+
+    result = rc.check(
+        start_node=start_location,
+        destination_ip=destination_ip,
+    )
 
     # separate out Flow and Traces
-    flow = result.iloc[0]['Flow']
-    traces = result.iloc[0]['Traces']
-
+    flow = result.iloc[0]["Flow"]
+    traces = result.iloc[0]["Traces"]
 
     t_result = TraceResult(traces=traces, flow=flow)
 
@@ -40,6 +76,7 @@ def main():
     walk_flow(flow)
     walk_traces(traces)
 
+
 def walk_flow(flow):
     print(f"Flow Source IP: {flow.srcIp}")
     print(f"Flow Dest IP: {flow.dstIp}")
@@ -47,7 +84,12 @@ def walk_flow(flow):
     print(f"Flow Ingress Node: {flow.ingressNode}")
     print(f"Flow Ingress VRF: {flow.ingressVrf}")
 
+    rr = ReachabilityResult()
 
+    rr.flow_result = FlowResult()
+    rr.flow_result.src_ip = flow.srcIp
+
+    print("hello")
 
 
 def walk_traces(traces):
@@ -84,21 +126,13 @@ def walk_traces(traces):
                     print(f"Next-hop IP: {step.detail.resolvedNexthopIp}")
 
 
-
-                
-
-
-
 class TraceResult:
-
     def __init__(self, traces=None, flow=None) -> None:
         pass
 
         self.traces = traces
         self.flow = flow
-    
-    
-  
+
 
 if __name__ == "__main__":
     main()
