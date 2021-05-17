@@ -156,8 +156,6 @@ def walk_flow(flow, rr):
     rr.flow_result.ingress_node = flow.ingressNode
     rr.flow_result.ingress_vrf = flow.ingressVrf
 
-    print("hello")
-
 
 def walk_traces(traces, rr):
 
@@ -177,9 +175,6 @@ def walk_traces(traces, rr):
             for step in hop:
 
                 new_step = Step()
-                # new_detail = Detail()
-                # new_route = Route()
-                # new_flow = Flow()
 
                 if step.action == "ORIGINATED":
                     new_step.action = "ORIGINATED"

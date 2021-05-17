@@ -224,10 +224,11 @@ class _batfishReachabilityCheck(action._action):
     """
 
     # input data
-
+    # src_ips = str()
+    # applications = str()
     start_node = str()
-    start_interface = str()
-    destination_ip = str()
+    # start_interface = str()
+    dst_ips = str()
 
     def doAction(self, data):
 
@@ -241,16 +242,16 @@ class _batfishReachabilityCheck(action._action):
             # create instance of AccessCheck and pass original batfish object as initial arg
             rc = ReachabilityCheck(
                 b_fish=b_fish,
-                start_node=self.start_node,
-                start_interface=self.start_interface,
-                destination_ip=self.destination_ip,
             )
 
             # Make the actual batfish query
 
-            results = rc.check()
+            rr = rc.check(
+                start_node=self.start_node,
+                dstIps=self.dst_ips,
+            )
 
-            data["eventData"]["remote"]["rc_results"] = results
+            data["eventData"]["remote"]["rc_results"] = rr
 
             if (len(data["eventData"]["remote"]["rc_results"])) > 0:
                 exitCode = 0

@@ -1,4 +1,3 @@
-
 # Fudge the python path
 import sys
 import os
@@ -7,8 +6,10 @@ import pandas as pd
 import pytest
 
 
-PACKAGE_PARENT = '../../../'
-SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+PACKAGE_PARENT = "../../../"
+SCRIPT_DIR = os.path.dirname(
+    os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__)))
+)
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 # end fudge python path
 
@@ -25,14 +26,15 @@ def main():
     rc = RouteCheck()
 
     ingress = f"@enter({start_node}[{start_interface}])"
-    
-    results = rc.check(ingress=ingress, destination_ip=destination_ip, snapshot_folder="/shared/data/storage/firewall-configs/snapshot")
 
-
+    results = rc.check(
+        ingress=ingress,
+        destination_ip=destination_ip,
+        snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+    )
 
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
-
 
     flow = results["Flow"]
     t_results = results["Traces"]
@@ -40,12 +42,14 @@ def main():
     walk_flow(flow)
     walk_traces(t_results)
 
+
 def walk_flow(flow):
     print(f"Flow Source IP: {flow.srcIp}")
     print(f"Flow Dest IP: {flow.dstIp}")
     print(f"Flow IP protocol: {flow.ipProtocol}")
     print(f"Flow Ingress Node: {flow.ingressNode}")
     print(f"Flow Ingress VRF: {flow.ingressVrf}")
+
 
 def walk_traces(t_results):
 
@@ -56,7 +60,9 @@ def walk_traces(t_results):
                 print(f"hop node: {hop.node}")
                 for step in hop:
                     if step.action == "ORIGINATED":
-                        print(f"step detail originating VRF: {step.detail.originatingVrf}")
+                        print(
+                            f"step detail originating VRF: {step.detail.originatingVrf}"
+                        )
                     elif step.action == "FORWARDED":
                         print(f"Arp IP: {step.detail.arpIp}")
                         print(f"Output Interface: {step.detail.outputInterface}")
@@ -87,15 +93,11 @@ def walk_traces(t_results):
 
 
 class TraceResult:
-
     def __init__(self, traces=None, flow=None) -> None:
         pass
 
         self.traces = traces
         self.flow = flow
-    
-
-
 
 
 if __name__ == "__main__":
