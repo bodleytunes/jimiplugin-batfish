@@ -1,4 +1,16 @@
+from typing import Dict, Any
 from plugins.batfish.includes.batfish import Batfish
+from plugins.batfish.includes.result_models.reachability import (
+    TraceResult,
+    ReachabilityResult,
+    FlowResult,
+    Step,
+    Hop,
+    Detail,
+    Route,
+    Flow,
+)
+from plugins.batfish.includes.helpers import *
 
 
 class RouteCheck(Batfish):
@@ -19,20 +31,28 @@ class RouteCheck(Batfish):
 
         pass
 
-    def check(self, ingress=None, destination_ip=None, snapshot_folder=None):
+    def check(
+        self,
+        **kwargs: Dict[Any, Any],
+    ):
 
-        self.destination_ip = destination_ip
+        # unpack keyword args
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
-        if ingress is not None:
-            self.ingress = ingress
-        else:
-            ingress = self.ingress
+        self.ingress = f"@enter({self.start_node}[{self.start_interface}])"
 
-        t = self.b_fish.bfq.traceroute(
-            startLocation=ingress, headers=self.b_fish.hc(dstIps=destination_ip)
+        results = self.b_fish.bfq.traceroute(
+            startLocation=self.ingress,
+            headers=self.b_fish.hc(dstIps=self.destination_ip),
         )
+        #! todo fix this
+        flow = results["Flow"]
+        results = results["Traces"]
 
-        #! todo - return useful structured data into a datastructure / object
-        result = t.answer().frame()
+        self.fl = FlowResult()
+        self.fl.generate_flow_data()
 
-        return result
+        # results = t.answer().frame()
+
+        return flow

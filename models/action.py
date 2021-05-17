@@ -163,14 +163,14 @@ class _batfishRouteCheck(action._action):
             # create instance of AccessCheck and pass original batfish object as initial arg
             rc = RouteCheck(
                 b_fish=b_fish,
-                start_node=self.start_node,
-                start_interface=self.start_interface,
             )
 
             # Make the actual batfish query
 
             results = rc.check(
                 destination_ip=self.destination_ip,
+                start_node=self.start_node,
+                start_interface=self.start_interface,
             )
 
             data["eventData"]["remote"]["rc_results"] = results
@@ -224,7 +224,7 @@ class _batfishReachabilityCheck(action._action):
     """
 
     # input data
-    # src_ips = str()
+    src_ips = str()
     # applications = str()
     start_node = str()
     # start_interface = str()
@@ -247,13 +247,19 @@ class _batfishReachabilityCheck(action._action):
             # Make the actual batfish query
 
             rr = rc.check(
+                srcIps=self.src_ips,
                 start_node=self.start_node,
                 dstIps=self.dst_ips,
             )
 
             data["eventData"]["remote"]["rc_results"] = rr
 
-            if (len(data["eventData"]["remote"]["rc_results"])) > 0:
+            data["eventData"]["remote"]["flow_results"] = rr.flow_result.__dict__
+            data["eventData"]["remote"]["trace_results"] = [
+                obj.__dict__ for obj in rr.trace_result
+            ]
+
+            if data["eventData"]["remote"]["rc_results"]:
                 exitCode = 0
             else:
                 exitCode = 255

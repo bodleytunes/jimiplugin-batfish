@@ -292,6 +292,7 @@ class AccessCheck(Batfish):
                 denied_result.denied == True
                 denied_results.append(denied_result)
 
+        # convert objects to dictionaries
         permit_results = [obj.__dict__ for obj in access_results]
         deny_results = [obj.__dict__ for obj in denied_results]
 
