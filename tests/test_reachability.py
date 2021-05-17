@@ -171,50 +171,108 @@ def walk_traces(traces, rr):
         for hop in trace:
             print(f"hop node: {hop.node}")
 
-            tr.hops = [Hop()]
+            tr.hops = []
+            new_hop = Hop()
 
-            for enum, step in enumerate(hop):
+            for step in hop:
 
                 new_step = Step()
-                new_detail = Detail()
-                new_route = Route()
+                # new_detail = Detail()
+                # new_route = Route()
+                # new_flow = Flow()
 
                 if step.action == "ORIGINATED":
+                    new_step.action = "ORIGINATED"
+
+                    new_detail = Detail()
                     print(f"step detail originating VRF: {step.detail.originatingVrf}")
                     # add to detail
                     new_detail.originating_vrf = step.detail.originatingVrf
 
+                    # tr.hops[enum].steps.append(new_step)
+                    new_step.details.append(new_detail)
+
                 elif step.action == "FORWARDED":
+
+                    new_step.action = "FORWARDED"
+                    new_detail = Detail()
+
                     print(f"Arp IP: {step.detail.arpIp}")
                     new_detail.arp_ip = step.detail.arpIp
                     print(f"Output Interface: {step.detail.outputInterface}")
                     new_detail.output_interface = step.detail.outputInterface
 
                     for route in step.detail.routes:
+                        new_route = Route()
+
                         # Put assertions in here?
                         print(f"Network: {route['network']}")
+                        new_route.network = route["network"]
                         print(f"Next-hop: {route['nextHopIp']}")
+                        new_route.next_Hop = route["nextHopIp"]
                         print(f"by Protocol: {route['protocol']}")
+                        new_route.via_protocol = route["protocol"]
+
+                        new_detail.routes.append(new_route)
+
+                    new_step.details.append(new_detail)
+
                 elif step.action == "PERMITTED":
+
+                    new_step.action = "PERMITTED"
+
+                    new_detail = Detail()
+                    new_flow = Flow()
+
                     print(f"Filter: {step.detail.filter}")
+                    new_detail.filter = step.detail.filter
                     print(f"Filter Type: {step.detail.filterType}")
+                    new_detail.filter_type = step.detail.filterType
                     print(f"Dest IP: {step.detail.flow.dstIp}")
+                    new_flow.dst_ip = step.detail.flow.dstIp
                     print(f"Dest Port: {step.detail.flow.dstPort}")
+                    new_flow.dst_port = step.detail.flow.dstPort
                     print(f"Ingress Node: {step.detail.flow.ingressNode}")
+                    new_flow.ingress_node = step.detail.flow.ingressNode
                     print(f"Ingress Interface: {step.detail.flow.ingressInterface}")
+                    new_flow.ingress_interface = step.detail.flow.ingressInterface
                     print(f"Ingress VRF: {step.detail.flow.ingressVrf}")
+                    new_flow.ingress_vrf = step.detail.flow.ingressVrf
                     print(f"IP Protocol: {step.detail.flow.ipProtocol}")
+                    new_flow.ip_protocol = step.detail.flow.ipProtocol
                     print(f"Source IP: {step.detail.flow.srcIp}")
+                    new_flow.src_ip = step.detail.flow.srcIp
+
+                    new_detail.flow = new_flow
+                    new_step.details.append(new_detail)
+
                 elif step.action == "TRANSMITTED":
+                    new_step.action = "TRANSMITTED"
+
+                    new_detail = Detail()
+
                     print(f"Output Interface: {step.detail.outputInterface}")
+                    new_detail.output_interface = step.detail.outputInterface
+
+                    new_step.details.append(new_detail)
+
                 elif step.action == "EXITS_NETWORK":
+
+                    new_step.action = "EXITS_NETWORK"
+                    new_detail = Detail()
+
                     print(f"Output Interface: {step.detail.outputInterface}")
+                    new_detail.output_interface = step.detail.outputInterface
                     print(f"Next-hop IP: {step.detail.resolvedNexthopIp}")
+                    new_detail.resolve_next_hop = step.detail.resolvedNexthopIp
 
-                # append stuff
-                new_step.details.append(new_detail)
-                tr.hops[enum].steps.append(new_step)
+                    new_step.details.append(new_detail)
 
+                # append steps to hop
+                new_hop.steps.append(new_step)
+
+            # add new hop to traceroute
+            tr.hops.append(new_hop)
         # add to the list of trace results
         rr.trace_result.append(tr)
 
