@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.result_models.reachability import (
     TraceResult,
@@ -41,21 +43,12 @@ class ReachabilityCheck(Batfish):
 
     def check(
         self,
-        ingress=None,
-        dstIps=None,
-        snapshot_folder=None,
-        srcIps=None,
-        applications=None,
-        dst_ports=None,
-        start_node=None,
+        **kwargs: Dict[Any, Any],
     ) -> ReachabilityResult:
 
-        self.srcIps = srcIps
-        self.dstIps = dstIps or None
-        self.applications = applications or None
-        self.dstPorts = dst_ports or None
-        self.start = start_node
-        # self.start_interface = start_interface
+        # unpack keyword args
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
         result = self.b_fish.bfq.reachability(
             pathConstraints=self.b_fish.pc(startLocation=self.start),
