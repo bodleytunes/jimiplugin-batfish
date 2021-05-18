@@ -1,10 +1,11 @@
+from plugins.batfish.includes.helpers import generate_new_dict
 from core.models import action
 from core import auth, helpers
 
 # from plugins.batfish.includes import batfish
 from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.access_check import AccessCheck
-from plugins.batfish.includes.route_check import RouteCheck
+from plugins.batfish.includes.trace_route_check import TraceRouteCheck
 from plugins.batfish.includes.reachability_check import ReachabilityCheck
 
 
@@ -129,11 +130,11 @@ class _batfishAccessCheck(action._action):
         )
 
 
-class _batfishRouteCheck(action._action):
+class _batfishTraceRouteCheck(action._action):
 
     """
     * Connect to existing batfish Batfish() object
-    * Create RouteCheck() and pass it the Batfish() client
+    * Create TraceRouteCheck() and pass it the Batfish() client
 
     Args:
         * data: event data (flow data)
@@ -160,22 +161,20 @@ class _batfishRouteCheck(action._action):
 
         if b_fish:
 
-            # create instance of AccessCheck and pass original batfish object as initial arg
-            rc = RouteCheck(
+            rc = TraceRouteCheck(
                 b_fish=b_fish,
+                start_node=self.start_node,
+                start_interface=self.start_interface,
             )
-
-            # Make the actual batfish query
-
-            results = rc.check(
+            results, results_list = rc.check(
                 destination_ip=self.destination_ip,
                 start_node=self.start_node,
                 start_interface=self.start_interface,
             )
 
-            data["eventData"]["remote"]["rc_results"] = results
+            data["eventData"]["remote"]["traceroute_results"] = results_list
 
-            if (len(data["eventData"]["remote"]["rc_results"])) > 0:
+            if (len(data["eventData"]["remote"]["traceroute_results"])) > 0:
                 exitCode = 0
             else:
                 exitCode = 255
@@ -203,7 +202,7 @@ class _batfishRouteCheck(action._action):
         if attr == "password" and not value.startswith("ENC "):
             self.password = "ENC {0}".format(auth.getENCFromPassword(value))
             return True
-        return super(_batfishRouteCheck, self).setAttribute(
+        return super(_batfishTraceRouteCheck, self).setAttribute(
             attr, value, sessionData=sessionData
         )
 

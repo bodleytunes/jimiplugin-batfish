@@ -2,7 +2,7 @@ from core import plugin, model
 
 
 class _batfish(plugin._plugin):
-    version = 1.8
+    version = 2.0
 
     def install(self):
         # Register batfish Models
@@ -28,6 +28,12 @@ class _batfish(plugin._plugin):
         model.registerModel(
             "batfishRouteCheck",
             "_batfishRouteCheck",
+            "_action",
+            "plugins.batfish.models.action",
+        )
+        model.registerModel(
+            "batfishTraceRouteCheck",
+            "_batfishTraceRouteCheck",
             "_action",
             "plugins.batfish.models.action",
         )
@@ -60,6 +66,12 @@ class _batfish(plugin._plugin):
             "_action",
             "plugins.batfish.models.action",
         )
+        model.deregisterModel(
+            "batfishTraceRouteCheck",
+            "_batfishTraceRouteCheck",
+            "_action",
+            "plugins.batfish.models.action",
+        )
         return True
 
     def upgrade(self, LatestPluginVersion):
@@ -89,6 +101,13 @@ class _batfish(plugin._plugin):
             model.registerModel(
                 "batfishRouteCheck",
                 "_batfishRouteCheck",
+                "_action",
+                "plugins.batfish.models.action",
+            )
+        if self.version < 2.0:
+            model.registerModel(
+                "batfishTraceRouteCheck",
+                "_batfishTraceRouteCheck",
                 "_action",
                 "plugins.batfish.models.action",
             )

@@ -13,17 +13,26 @@ SCRIPT_DIR = os.path.dirname(
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 # end fudge python path
 
-from plugins.batfish.includes.route_check import RouteCheck
+from plugins.batfish.includes.trace_route_check import TraceRouteCheck
+from plugins.batfish.includes.batfish import Batfish
+from plugins.batfish.includes.result_models.traceroute import DataviewTraceroute
+
 
 start_node = "spoke1"
 start_interface = "port4"
-destination_ip = "8.8.8.8"
+destination_ip = "172.16.2.4"
 
 
 @pytest.mark.batfish
 def main():
 
-    rc = RouteCheck()
+    b = Batfish()
+
+    b.init_batfish(
+        snapshot_folder="/shared/data/storage/firewall-configs/snapshot",
+    )
+
+    rc = TraceRouteCheck(b_fish=b)
 
     ingress = f"@enter({start_node}[{start_interface}])"
 
@@ -36,11 +45,12 @@ def main():
     pd.set_option("max_rows", None)
     pd.set_option("max_columns", None)
 
-    flow = results["Flow"]
-    t_results = results["Traces"]
+    # separate out Flow and Traces
+    flow = results.iloc[0]["Flow"]
+    traces = results.iloc[0]["Traces"]
 
     walk_flow(flow)
-    walk_traces(t_results)
+    walk_traces(traces)
 
 
 def walk_flow(flow):
@@ -51,44 +61,56 @@ def walk_flow(flow):
     print(f"Flow Ingress VRF: {flow.ingressVrf}")
 
 
-def walk_traces(t_results):
+def walk_traces(traces):
+    dvt_list = []
 
-    for result in t_results:
-        for trace in result:
-            print(f"Trace dispostion: {trace.disposition}")
-            for hop in trace:
-                print(f"hop node: {hop.node}")
-                for step in hop:
-                    if step.action == "ORIGINATED":
-                        print(
-                            f"step detail originating VRF: {step.detail.originatingVrf}"
-                        )
-                    elif step.action == "FORWARDED":
-                        print(f"Arp IP: {step.detail.arpIp}")
-                        print(f"Output Interface: {step.detail.outputInterface}")
-                        for route in step.detail.routes:
-                            # Put assertions in here?
-                            print(f"Network: {route['network']}")
-                            print(f"Next-hop: {route['nextHopIp']}")
-                            print(f"by Protocol: {route['protocol']}")
-                    elif step.action == "PERMITTED":
-                        print(f"Filter: {step.detail.filter}")
-                        print(f"Filter Type: {step.detail.filterType}")
-                        print(f"Dest IP: {step.detail.flow.dstIp}")
-                        print(f"Dest Port: {step.detail.flow.dstPort}")
-                        print(f"Ingress Node: {step.detail.flow.ingressNode}")
-                        print(f"Ingress Interface: {step.detail.flow.ingressInterface}")
-                        print(f"Ingress VRF: {step.detail.flow.ingressVrf}")
-                        print(f"IP Protocol: {step.detail.flow.ipProtocol}")
-                        print(f"Source IP: {step.detail.flow.srcIp}")
-                    elif step.action == "TRANSMITTED":
-                        print(f"Output Interface: {step.detail.outputInterface}")
-                    elif step.action == "EXITS_NETWORK":
-                        print(f"Output Interface: {step.detail.outputInterface}")
-                        print(f"Next-hop IP: {step.detail.resolvedNexthopIp}")
+    for trace in traces:
+        print(f"Trace dispostion: {trace.disposition}")
+        # create new dataview traceroute
+        dvt = DataviewTraceroute()
+
+        for hop in trace:
+            print(f"hop node: {hop.node}")
+            dvt.hop_node = hop.node
+            for step in hop:
+                if step.action == "ORIGINATED":
+                    print(f"step detail originating VRF: {step.detail.originatingVrf}")
+                    dvt.originating_vrf = step.detail.originatingVrf
+                elif step.action == "FORWARDED":
+                    print(f"Arp IP: {step.detail.arpIp}")
+                    dvt.arp_ip = step.detail.arpIp
+                    print(f"Output Interface: {step.detail.outputInterface}")
+                    dvt.output_interface = step.detail.outputInterface
+                    for route in step.detail.routes:
+                        # Put assertions in here?
+                        print(f"Network: {route['network']}")
+                        dvt.network = route["network"]
+                        print(f"Next-hop: {route['nextHopIp']}")
+                        dvt.next_hop_ip = route["nextHopIp"]
+                        print(f"by Protocol: {route['protocol']}")
+                        dvt.via_protocol = route["nextHopIp"]
+                elif step.action == "PERMITTED":
+                    print(f"Filter: {step.detail.filter}")
+                    print(f"Filter Type: {step.detail.filterType}")
+                    print(f"Dest IP: {step.detail.flow.dstIp}")
+                    print(f"Dest Port: {step.detail.flow.dstPort}")
+                    print(f"Ingress Node: {step.detail.flow.ingressNode}")
+                    print(f"Ingress Interface: {step.detail.flow.ingressInterface}")
+                    print(f"Ingress VRF: {step.detail.flow.ingressVrf}")
+                    print(f"IP Protocol: {step.detail.flow.ipProtocol}")
+                    print(f"Source IP: {step.detail.flow.srcIp}")
+                elif step.action == "TRANSMITTED":
+                    print(f"Output Interface: {step.detail.outputInterface}")
+                elif step.action == "EXITS_NETWORK":
+                    print(f"Output Interface: {step.detail.outputInterface}")
+                    dvt.output_interface = step.detail.outputInterface
+                    print(f"Next-hop IP: {step.detail.resolvedNexthopIp}")
+                    dvt.resolved_next_hop_ip = step.detail.resolvedNexthopIp
+        # append dataview traceroute to list
+        dvt_list.append(dvt)
 
 
-## cast assertions
+## cast assrtions
 # disposition accepted?
 
 
