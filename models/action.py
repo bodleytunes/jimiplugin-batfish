@@ -4,9 +4,12 @@ from core import auth, helpers
 
 # from plugins.batfish.includes import batfish
 from plugins.batfish.includes.batfish import Batfish
-from plugins.batfish.includes.access_check import AccessCheck
-from plugins.batfish.includes.trace_route_check import TraceRouteCheck
-from plugins.batfish.includes.reachability_check import ReachabilityCheck
+from plugins.batfish.includes.queries.access_check import AccessCheck
+from plugins.batfish.includes.queries.trace_route_check import TraceRouteCheck
+from plugins.batfish.includes.queries.reachability_check import ReachabilityCheck
+
+# from plugins.batfish.includes.queries.ip_owners import IpOwnersCheck
+# from plugins.batfish.includes.queries.node_properties import NodePropertiesCheck
 
 
 class _batfishConnect(action._action):
@@ -23,8 +26,8 @@ class _batfishConnect(action._action):
             returns: Results and Return codes
         """
         # Create instance of batfish
-        b_fish = Batfish()
-        b_fish.init_batfish(host=host, snapshot_folder=self.snapshot_folder)
+        b_fish = Batfish(host=host, snapshot_folder=self.snapshot_folder)
+        # b_fish.init_batfish()
 
         if b_fish != None:
             data["eventData"]["remote"] = {}
@@ -84,7 +87,12 @@ class _batfishAccessCheck(action._action):
 
             # Make the actual batfish query
 
-            (permit_results, deny_results, merged_results,) = ac.get_results(
+            (
+                permit_results,
+                deny_results,
+                accept_results,
+                merged_results,
+            ) = ac.get_results(
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
                 applications=self.applications,
@@ -93,11 +101,15 @@ class _batfishAccessCheck(action._action):
                 nodes=self.nodes,
             )
 
-            # data["eventData"]["remote"]["access_results"] = results
-            data["eventData"]["remote"]["permit_results"] = permit_results
-            data["eventData"]["remote"]["deny_results"] = deny_results
+            # data["eventData"]["remote"]["merged_results"] = merged_results
+            data["eventData"]["batfish_access_query"] = {}
+            data["eventData"]["batfish_access_query"] = {
+                "accept_results": accept_results
+            }
+            data["eventData"]["batfish_access_query"]["deny_results"] = {}
+            data["eventData"]["batfish_access_query"]["deny_results"] = deny_results
 
-            if (len(data["eventData"]["remote"]["permit_results"])) > 0:
+            if (len(data["eventData"]["batfish_access_query"]["accept_results"])) > 0:
                 exitCode = 0
             else:
                 exitCode = 255

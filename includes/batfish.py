@@ -17,6 +17,11 @@ class Batfish:
         self.host = "10.12.12.134"
         self.snapshot_folder = snapshot_folder
 
+        self.hc = HeaderConstraints
+        self.pc = PathConstraints
+
+        self.init_batfish()
+
     def init_batfish(self, host=None, snapshot_folder=None):
 
         bf_session.host = self.host
@@ -25,12 +30,10 @@ class Batfish:
         bf_set_network(self.NETWORK_NAME)
 
         # Initialize Batfish Snapshot
-        bf_init_snapshot(snapshot_folder, name=self.NETWORK_NAME, overwrite=True)
+        bf_init_snapshot(self.snapshot_folder, name=self.NETWORK_NAME, overwrite=True)
         # Generate Dataplane
         bf_generate_dataplane()
         # Load Batfish Questions
         load_questions()
 
         self.bfq = bfq
-        self.hc = HeaderConstraints
-        self.pc = PathConstraints
