@@ -76,14 +76,14 @@ class _batfish(plugin._plugin):
 
     def upgrade(self, LatestPluginVersion):
 
-        if self.version < 2.1:
+        if self.version < 1.5:
             model.registerModel(
                 "batfishAccessCheck",
                 "_batfishAccessCheck",
                 "_action",
                 "plugins.batfish.models.action",
             )
-        if self.version < 2.1:
+        if self.version < 1.6:
             model.registerModel(
                 "batfishConnect",
                 "_batfishConnect",
@@ -104,7 +104,7 @@ class _batfish(plugin._plugin):
                 "_action",
                 "plugins.batfish.models.action",
             )
-        if self.version < 2.0:
+        if self.version < 1.9:
             model.registerModel(
                 "batfishTraceRouteCheck",
                 "_batfishTraceRouteCheck",
