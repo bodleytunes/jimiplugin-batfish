@@ -10,7 +10,7 @@ from pybatfish.datamodel.flow import HeaderConstraints, PathConstraints
 
 
 class Batfish:
-    def __init__(self, NETWORK_NAME=None, host=None, snapshot_folder=None) -> None:
+    def __init__(self, NETWORK_NAME=None, host=None, snapshot_folder=None):
         self.NETWORK_NAME = "Firewalls"
         self.host = host
         self.snapshot_folder = snapshot_folder

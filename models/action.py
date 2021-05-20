@@ -1,8 +1,7 @@
-from plugins.batfish.includes.helpers import generate_new_dict
+# from plugins.batfish.includes.helpers import generate_new_dict
 from core.models import action
 from core import auth, helpers
 
-# from plugins.batfish.includes import batfish
 from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.queries.access_check import AccessCheck
 from plugins.batfish.includes.queries.trace_route_check import TraceRouteCheck

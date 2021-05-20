@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional, Union, List
 
 
-class AcceptResult(object):
+class AcceptResult:
     def __init__(
         self,
         query_node: Optional[str] = None,
@@ -48,7 +48,7 @@ class AcceptResult(object):
         self.result_data = result_data
 
 
-class DeniedResult(object):
+class DeniedResult:
     def __init__(
         self,
         query_node: Optional[str] = None,
