@@ -1,6 +1,9 @@
-from typing import Any, Dict, Optional, Union, List, Tuple
+from typing import Optional, List, Tuple
 import re
 from collections import defaultdict
+
+import pandas as pd
+
 
 from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.result_models.access import AcceptResult, DeniedResult
@@ -37,13 +40,6 @@ class AccessCheck(Batfish):
 
         pass
 
-    """
-    Name: Get Results
-    Overview: 
-    Args: Params relating to checking access/policy
-    Returns: Processed Access results
-    """
-
     def get_results(
         self,
         src_ip=None,
@@ -53,6 +49,19 @@ class AccessCheck(Batfish):
         ip_protocols=None,
         nodes=None,
     ) -> Tuple[List[dict], List[dict]]:
+        """Get Batfish Results
+
+        Args:
+            src_ip (string, optional): source ip. Defaults to None.
+            destination_ip (string, optional): destination ip. Defaults to None.
+            applications (list, optional): list of applications. Defaults to None.
+            dst_ports (list, optional): list of destination ports. Defaults to None.
+            ip_protocols (list, optional): list of protocols. Defaults to None.
+            nodes (list, optional): list of nodes(network devices/firewalls etc)to query. Defaults to None.
+
+        Returns:
+            Tuple[List[dict], List[dict]]: 2 variables, each a list of dictionaries for permitted and denied results
+        """
 
         self.src_ip = src_ip
         self.destination_ip = destination_ip
@@ -82,16 +91,17 @@ class AccessCheck(Batfish):
         # return both deny and results variables to "action"
         return deny_results, accept_results
 
-    """
-    Name: Make Query
-    Args: Params relating to checking access/policy
-    Returns: Batfish Query Dataframe
-    """
+    def _query(self, nodes=None) -> pd.DataFrame:
+        """Do Batfish Query
 
-    def _query(self, nodes=None):
+        Args:
+            nodes (list, optional): list of nodes to query. Defaults to None.
 
-        """
-        set header constraints
+        Raises:
+            BatfishException: batfish exception
+
+        Returns:
+            pd.DataFrame: returns nested structured data frame
         """
         if self.applications is not None:
 
@@ -110,7 +120,7 @@ class AccessCheck(Batfish):
                 dstPorts=self._filter_text(self.dst_ports),
                 ipProtocols=self._make_upper(self.ip_protocols),
             )
-        """ 
+        """
         make query
         """
         # nodes is actually a single node here, not sure why batfish have named it "nodes"?
@@ -124,10 +134,20 @@ class AccessCheck(Batfish):
             raise BatfishException(f"Batfish Query failure :  {e}")
             # return {}
 
-    def _build_results(self, results_dict) -> Tuple[List[dict], List[dict]]:
+    def _build_results(
+        self, results_dict: List[pd.DataFrame]
+    ) -> Tuple[List[dict], List[dict]]:
+        """Build event data results
 
-        accept_results = []
-        denied_results = []
+        Args:
+            results_dict (List[pd.DataFrame]): Pass in list of dataframes (one per node)
+
+        Returns:
+            Tuple[List[dict], List[dict]]: 2 Lists of dicts for denied results and accept results
+        """
+
+        accept_results = list()
+        denied_results = list()
 
         # Walks its way through a deply nested dataframe type structure
         for node, result in results_dict.items():
@@ -232,7 +252,7 @@ class AccessCheck(Batfish):
                         # generate a DENY entry
                         denied_result = DeniedResult()
 
-                        denied_result.denied == True
+                        denied_result.denied = True
                         denied_result.query_node = node
 
                         denied_results.append(denied_result)
@@ -249,7 +269,7 @@ class AccessCheck(Batfish):
             for item in list(i):
                 denied_result = DeniedResult()
                 denied_result.query_node = item
-                denied_result.denied == True
+                denied_result.denied = True
                 denied_results.append(denied_result)
 
         # convert the AcceptResult() and DenyResult() objects to dictionaries so they can be consumed by eventData
@@ -296,7 +316,10 @@ class AccessCheck(Batfish):
     def _filter_text(self, arg) -> str:
         # filter empty "" or ''
         if arg:
-            converter = lambda i: i or None
+
+            def converter(i):
+                return i or None
+
             result = [converter(i) for i in arg]
             return result
         return
