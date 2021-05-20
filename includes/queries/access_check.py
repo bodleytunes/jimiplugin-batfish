@@ -121,7 +121,7 @@ class AccessCheck(Batfish):
             return result
         except BatfishException as e:
             print(e)
-            raise BatfishException(f"Batfish Query failure")
+            raise BatfishException(f"Batfish Query failure :  {e}")
             # return {}
 
     def _build_results(self, results_dict) -> Tuple[List[dict], List[dict]]:
