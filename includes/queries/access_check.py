@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple, DefaultDict, Any
+from typing import Optional, List, Tuple, DefaultDict, Any, Union
 import re
 from collections import defaultdict
 
@@ -91,7 +91,7 @@ class AccessCheck(Batfish):
         # return both deny and results variables to "action"
         return deny_results, accept_results
 
-    def _query(self, nodes=None) -> pd.DataFrame:
+    def _query(self, nodes: Optional[list] = None) -> pd.DataFrame:
         """Do Batfish Query
 
         Args:
@@ -279,7 +279,7 @@ class AccessCheck(Batfish):
         return deny_results, accept_results
 
     # split data delimited by ~ into separate strings
-    def _split_ingress_egress(self, ingress_egress):
+    def _split_ingress_egress(self, ingress_egress: str) -> Tuple[str, str, str, str]:
 
         split_list = ingress_egress.split("~")
 
