@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, DefaultDict, Any
 import re
 from collections import defaultdict
 
@@ -17,9 +17,9 @@ class AccessCheck(Batfish):
         host: Optional[str] = None,
         src_ip: Optional[str] = None,
         destination_ip: Optional[str] = None,
-        applications: Optional[str] = None,
-        dst_ports: Optional[str] = None,
-        ip_protocols: Optional[list] = None,
+        applications: Optional[list] = None,
+        dst_ports: Optional[list] = None,
+        ip_protocols: List[Any] = None,
         nodes: Optional[str] = None,
         snapshot_folder: Optional[str] = None,
         b_fish=None,
@@ -33,7 +33,7 @@ class AccessCheck(Batfish):
         self.dst_ports = dst_ports
         self.ip_protocols = ip_protocols
         self.snapshot_folder = snapshot_folder
-        self.nodes = "hub2"
+        # self.nodes = "hub2"
 
         # Instance of a batfish object
         self.b_fish = b_fish
@@ -42,12 +42,12 @@ class AccessCheck(Batfish):
 
     def get_results(
         self,
-        src_ip=None,
-        destination_ip=None,
-        applications=None,
-        dst_ports=None,
-        ip_protocols=None,
-        nodes=None,
+        src_ip: Optional[str] = None,
+        destination_ip: Optional[str] = None,
+        applications: Optional[list] = None,
+        dst_ports: Optional[list] = None,
+        ip_protocols: List[Any] = None,
+        nodes: Optional[list] = None,
     ) -> Tuple[List[dict], List[dict]]:
         """Get Batfish Results
 
@@ -103,7 +103,7 @@ class AccessCheck(Batfish):
         Returns:
             pd.DataFrame: returns nested structured data frame
         """
-        if self.applications is not None:
+        if len(self.applications) > 0:
 
             # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
             flow = self.b_fish.hc(
@@ -112,7 +112,7 @@ class AccessCheck(Batfish):
                 applications=self._filter_text(self.applications),
             )
 
-        elif self.dst_ports is not None:
+        elif len(self.dst_ports) > 0:
             # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
@@ -135,7 +135,7 @@ class AccessCheck(Batfish):
             # return {}
 
     def _build_results(
-        self, results_dict: List[pd.DataFrame]
+        self, results_dict: DefaultDict[str, List[Any]]
     ) -> Tuple[List[dict], List[dict]]:
         """Build event data results
 
@@ -313,7 +313,7 @@ class AccessCheck(Batfish):
 
         return traffic_denied_hosts
 
-    def _filter_text(self, arg) -> str:
+    def _filter_text(self, arg: List[Any]) -> List[Any]:
         # filter empty "" or ''
         if arg:
 
@@ -322,11 +322,11 @@ class AccessCheck(Batfish):
 
             result = [converter(i) for i in arg]
             return result
-        return
+        return arg
 
-    def _make_upper(self, arg) -> str:
-        #  make uppercase
-        if arg:
+    def _make_upper(self, arg: List[Any]) -> List[Any]:
+
+        if type(arg):
             result = [x.upper() for x in arg]
             return result
-        return
+        return arg
