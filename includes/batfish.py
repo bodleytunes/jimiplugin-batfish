@@ -1,5 +1,3 @@
-import os
-
 from pybatfish.client.commands import (
     bf_generate_dataplane,
     bf_session,
@@ -14,7 +12,7 @@ from pybatfish.datamodel.flow import HeaderConstraints, PathConstraints
 class Batfish:
     def __init__(self, NETWORK_NAME=None, host=None, snapshot_folder=None) -> None:
         self.NETWORK_NAME = "Firewalls"
-        self.host = "10.12.12.134"
+        self.host = host
         self.snapshot_folder = snapshot_folder
 
         self.hc = HeaderConstraints

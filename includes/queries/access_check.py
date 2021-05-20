@@ -11,7 +11,6 @@ class AccessCheck(Batfish):
         self,
         batfish_server: Optional[str] = None,
         host: Optional[str] = None,
-        ingress: Optional[str] = None,
         src_ip: Optional[str] = None,
         destination_ip: Optional[str] = None,
         applications: Optional[str] = None,
@@ -32,7 +31,7 @@ class AccessCheck(Batfish):
         self.snapshot_folder = snapshot_folder
         self.nodes = "hub2"
 
-        # Instance of batfish object
+        # Instance of a batfish object
         self.b_fish = b_fish
 
         pass
@@ -61,15 +60,19 @@ class AccessCheck(Batfish):
         self.ip_protocols = ip_protocols
         self.nodes = nodes
 
+        # create empty list for returned results (Accept and Deny results)
         results_dict = defaultdict(list)
 
-        #! todo this needs refactoring
+        # Loop through all passed in nodes(Network devices/Firewalls)
         for node in self.nodes:
 
-            result = self.check(nodes=node)
+            # Run access checker to make the batfish query per node and return result
+            result = self._check(nodes=node)
 
+            # Append each nodes query result to the list
             results_dict[node].append(result)
 
+        # process results and return dictionary type data suitable for merging with eventData
         (
             deny_results,
             accept_results,
@@ -83,10 +86,10 @@ class AccessCheck(Batfish):
     Returns: Batfish Query Dataframe
     """
 
-    def check(self, nodes=None):
+    def _check(self, nodes=None):
 
         if self.applications is not None:
-
+            # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
                 dstIps=self.destination_ip,
@@ -94,7 +97,7 @@ class AccessCheck(Batfish):
             )
 
         elif self.dst_ports is not None:
-
+            # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
                 dstIps=self.destination_ip,
@@ -102,6 +105,8 @@ class AccessCheck(Batfish):
                 ipProtocols=self._make_upper(self.ip_protocols),
             )
 
+        # nodes is actually a single node here, not sure why batfish have named it "nodes"?
+        # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
         query = self.b_fish.bfq.testFilters(headers=flow, nodes=nodes)
 
         result = query.answer().frame()
@@ -113,11 +118,13 @@ class AccessCheck(Batfish):
         accept_results = []
         denied_results = []
 
+        # Walks its way through a deply nested dataframe type structure
         for node, result in results_dict.items():
 
             for r in result:
 
                 for v in r.values:
+                    # if re: hits a "permit" then do something
                     if re.search("permit", v[3], re.IGNORECASE):
                         accept_result = AcceptResult()
                         accept_result.query_node = node
@@ -126,6 +133,7 @@ class AccessCheck(Batfish):
                             for item in v[5]:
                                 for item_child in item.children:
                                     for c in item_child.children:
+                                        # if re: hits a "permitted" then dig deeper
                                         if re.search(
                                             "permitted",
                                             c.traceElement.fragments[0].text,
@@ -139,10 +147,10 @@ class AccessCheck(Batfish):
                                                     print(f"Node Queried is: {e}")
 
                                                 if enum == 1:
-
+                                                    # start adding data to the AcceptResult() objects fields
                                                     accept_result.ingress_egress = e
 
-                                                    # split ingress egress string
+                                                    # split ingress egress string into separate fields
                                                     (
                                                         ingress_zone,
                                                         ingress_iface,
@@ -165,7 +173,7 @@ class AccessCheck(Batfish):
                                                     )
                                                 if enum == 2:
                                                     accept_result.flow_details = e
-                                                    # other details
+                                                    # Add details relating to IP headers
                                                     accept_result.destination_address = (
                                                         accept_result.flow_details.dstIp
                                                     )
@@ -181,6 +189,7 @@ class AccessCheck(Batfish):
                                                     accept_result.ingress_vrf = (
                                                         accept_result.flow_details.ingressVrf
                                                     )
+                                                    # resetting this to None as it would add a nested object of type Flow
                                                     accept_result.flow_details = None
 
                                                 if enum == 4:
@@ -198,6 +207,7 @@ class AccessCheck(Batfish):
                                                         .traceElement.fragments[2]
                                                         .text
                                                     )
+                                                    # resetting this to None as it would add a nested object of type TraceTreeList
                                                     accept_result.trace_tree_list = None
 
                         if accept_result.flow_result == "PERMIT":
@@ -228,8 +238,7 @@ class AccessCheck(Batfish):
                 denied_result.denied == True
                 denied_results.append(denied_result)
 
-        # convert objects to dictionaries
-
+        # convert the AcceptResult() and DenyResult() objects to dictionaries so they can be consumed by eventData
         deny_results = [obj.__dict__ for obj in denied_results]
         accept_results = [accept_result.__dict__ for accept_result in accept_results]
 
@@ -276,7 +285,7 @@ class AccessCheck(Batfish):
         return
 
     def _make_upper(self, arg) -> str:
-        #  make protocols uppercase
+        #  make uppercase
         if arg:
             result = [x.upper() for x in arg]
             return result
