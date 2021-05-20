@@ -91,7 +91,7 @@ class _batfishAccessCheck(action._action):
             ac = AccessCheck(b_fish=b_fish)
 
             # Make the actual batfish query and received the deny and accept results
-            (deny_results, accept_results,) = ac.get_results(
+            deny_results, accept_results = ac.get_results(
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
                 applications=self.applications,
