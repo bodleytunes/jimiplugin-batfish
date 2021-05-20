@@ -17,6 +17,7 @@ class AcceptResult(object):
         ingress_node: Optional[str] = None,
         source_address: Optional[str] = None,
         destination_address: Optional[str] = None,
+        dst_ports: Optional[str] = None,
         service: Optional[str] = None,
         ip_protocol: Optional[str] = None,
         permit_rule: Optional[str] = None,
@@ -38,6 +39,7 @@ class AcceptResult(object):
         self.ingress_node = ingress_node
         self.source_address = source_address
         self.destination_address = destination_address
+        self.dst_ports = dst_ports
         self.service = service
         self.ip_protocol = ip_protocol
         self.permit_rule = permit_rule

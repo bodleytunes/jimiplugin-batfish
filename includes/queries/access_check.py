@@ -1,9 +1,10 @@
-from typing import Any, Dict, Optional, Union, List
+from typing import Any, Dict, Optional, Union, List, Tuple
 import re
 from collections import defaultdict
 
 from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.result_models.access import AcceptResult, DeniedResult
+from pybatfish.exception import BatfishException
 
 
 class AccessCheck(Batfish):
@@ -51,7 +52,7 @@ class AccessCheck(Batfish):
         dst_ports=None,
         ip_protocols=None,
         nodes=None,
-    ) -> Dict[str, Any]:
+    ) -> Tuple[List[dict], List[dict]]:
 
         self.src_ip = src_ip
         self.destination_ip = destination_ip
@@ -67,7 +68,7 @@ class AccessCheck(Batfish):
         for node in self.nodes:
 
             # Run access checker to make the batfish query per node and return result
-            result = self._check(nodes=node)
+            result = self._query(nodes=node)
 
             # Append each nodes query result to the list
             results_dict[node].append(result)
@@ -86,9 +87,13 @@ class AccessCheck(Batfish):
     Returns: Batfish Query Dataframe
     """
 
-    def _check(self, nodes=None):
+    def _query(self, nodes=None):
 
+        """
+        set header constraints
+        """
         if self.applications is not None:
+
             # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
@@ -104,16 +109,21 @@ class AccessCheck(Batfish):
                 dstPorts=self._filter_text(self.dst_ports),
                 ipProtocols=self._make_upper(self.ip_protocols),
             )
-
+        """ 
+        make query
+        """
         # nodes is actually a single node here, not sure why batfish have named it "nodes"?
         # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
-        query = self.b_fish.bfq.testFilters(headers=flow, nodes=nodes)
+        try:
+            query = self.b_fish.bfq.testFilters(headers=flow, nodes=nodes)
+            result = query.answer().frame()
+            return result
+        except BatfishException as e:
+            print(e)
+            raise BatfishException(f"Batfish Query failure")
+            # return {}
 
-        result = query.answer().frame()
-
-        return result
-
-    def _build_results(self, results_dict) -> Union[AcceptResult, DeniedResult]:
+    def _build_results(self, results_dict) -> Tuple[List[dict], List[dict]]:
 
         accept_results = []
         denied_results = []
@@ -180,6 +190,9 @@ class AccessCheck(Batfish):
                                                     accept_result.source_address = (
                                                         accept_result.flow_details.srcIp
                                                     )
+                                                    accept_result.dst_ports = (
+                                                        accept_result.flow_details.dstPort
+                                                    )
                                                     accept_result.service = (
                                                         accept_result.flow_details.ipProtocol
                                                     )
@@ -189,6 +202,7 @@ class AccessCheck(Batfish):
                                                     accept_result.ingress_vrf = (
                                                         accept_result.flow_details.ingressVrf
                                                     )
+
                                                     # resetting this to None as it would add a nested object of type Flow
                                                     accept_result.flow_details = None
 

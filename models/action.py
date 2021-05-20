@@ -115,6 +115,8 @@ class _batfishAccessCheck(action._action):
                 exitCode = 255
 
             if exitCode == 0:
+                # remove batfish connection object
+                data["eventData"]["remote"] = {}
 
                 return {
                     "result": True,
