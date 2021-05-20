@@ -66,7 +66,7 @@ class AccessCheck(Batfish):
         #! todo this needs refactoring
         for node in self.nodes:
 
-            result = self.check()
+            result = self.check(nodes=node)
 
             results_dict[node].append(result)
 
@@ -83,9 +83,7 @@ class AccessCheck(Batfish):
     Returns: Batfish Query Dataframe
     """
 
-    def check(
-        self,
-    ):
+    def check(self, nodes=None):
 
         if self.applications is not None:
 
@@ -104,7 +102,7 @@ class AccessCheck(Batfish):
                 ipProtocols=self._make_upper(self.ip_protocols),
             )
 
-        query = self.b_fish.bfq.testFilters(headers=flow, nodes=self.nodes)
+        query = self.b_fish.bfq.testFilters(headers=flow, nodes=nodes)
 
         result = query.answer().frame()
 
