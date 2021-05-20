@@ -67,18 +67,19 @@ class AccessCheck(Batfish):
         # Loop through all passed in nodes(Network devices/Firewalls)
         for node in self.nodes:
 
-            # Run access checker to make the batfish query per node and return result
+            # Run access checker function to make the batfish query on a per node basis and return a result for each of them
             result = self._query(nodes=node)
 
             # Append each nodes query result to the list
             results_dict[node].append(result)
 
-        # process results and return dictionary type data suitable for merging with eventData
+        # process results (walk dataframe) and return dictionary type data suitable for merging with eventData
         (
             deny_results,
             accept_results,
         ) = self._build_results(results_dict)
 
+        # return both deny and results variables to "action"
         return deny_results, accept_results
 
     """
@@ -160,7 +161,7 @@ class AccessCheck(Batfish):
                                                     # start adding data to the AcceptResult() objects fields
                                                     accept_result.ingress_egress = e
 
-                                                    # split ingress egress string into separate fields
+                                                    # split ingress/egress string into separate fields/attributes
                                                     (
                                                         ingress_zone,
                                                         ingress_iface,
@@ -183,7 +184,7 @@ class AccessCheck(Batfish):
                                                     )
                                                 if enum == 2:
                                                     accept_result.flow_details = e
-                                                    # Add details relating to IP headers
+                                                    # Add details relating to IP headers/5 tuple
                                                     accept_result.destination_address = (
                                                         accept_result.flow_details.dstIp
                                                     )
@@ -203,7 +204,7 @@ class AccessCheck(Batfish):
                                                         accept_result.flow_details.ingressVrf
                                                     )
 
-                                                    # resetting this to None as it would add a nested object of type Flow
+                                                    # Now resetting this to None as it would add a nested object of type Flow()
                                                     accept_result.flow_details = None
 
                                                 if enum == 4:
@@ -237,8 +238,7 @@ class AccessCheck(Batfish):
                         denied_results.append(denied_result)
 
         # then whittle all denied results down to only one per query node
-        # merged_results = [*accept_results, *denied_results]
-        # if entry in access results then remove all from denied
+        # if we find a node entry in accessresults then remove all from denied
         traffic_denied_hosts = self._remove_denied(accept_results, denied_results)
         traffic_denied_hosts = self._remove_dupes(traffic_denied_hosts)
 
@@ -254,10 +254,11 @@ class AccessCheck(Batfish):
 
         # convert the AcceptResult() and DenyResult() objects to dictionaries so they can be consumed by eventData
         deny_results = [obj.__dict__ for obj in denied_results]
-        accept_results = [accept_result.__dict__ for accept_result in accept_results]
+        accept_results = [obj.__dict__ for obj in accept_results]
 
         return deny_results, accept_results
 
+    # split data delimited by ~ into separate strings
     def _split_ingress_egress(self, ingress_egress):
 
         split_list = ingress_egress.split("~")
@@ -269,6 +270,7 @@ class AccessCheck(Batfish):
 
         return ingress_zone, ingress_iface, egress_zone, egress_iface
 
+    # remove any deny results if a node has an accept
     def _remove_denied(self, accept_results, denied_results) -> List[DeniedResult]:
         # remove denied entries
         for a in accept_results:
@@ -280,6 +282,7 @@ class AccessCheck(Batfish):
 
         return denied_results
 
+    # remove duplicate hits
     def _remove_dupes(self, denied_results) -> list:
 
         # make unique/remove repeated denies/duplicate nodes
