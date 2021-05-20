@@ -20,9 +20,11 @@ class Batfish:
         self.hc = HeaderConstraints
         self.pc = PathConstraints
 
+        self.bfq = bfq
+
         self.init_batfish()
 
-    def init_batfish(self, host=None, snapshot_folder=None):
+    def init_batfish(self):
 
         bf_session.host = self.host
         bf_session.coordinatorHost = self.host
@@ -35,5 +37,3 @@ class Batfish:
         bf_generate_dataplane()
         # Load Batfish Questions
         load_questions()
-
-        self.bfq = bfq

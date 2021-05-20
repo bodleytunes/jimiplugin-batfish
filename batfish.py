@@ -26,12 +26,6 @@ class _batfish(plugin._plugin):
             "plugins.batfish.models.action",
         )
         model.registerModel(
-            "batfishRouteCheck",
-            "_batfishRouteCheck",
-            "_action",
-            "plugins.batfish.models.action",
-        )
-        model.registerModel(
             "batfishTraceRouteCheck",
             "_batfishTraceRouteCheck",
             "_action",
@@ -57,12 +51,6 @@ class _batfish(plugin._plugin):
         model.deregisterModel(
             "batfishReachabilityCheck",
             "_batfishReachabilityCheck",
-            "_action",
-            "plugins.batfish.models.action",
-        )
-        model.deregisterModel(
-            "batfishRouteCheck",
-            "_batfishRouteCheck",
             "_action",
             "plugins.batfish.models.action",
         )
@@ -94,13 +82,6 @@ class _batfish(plugin._plugin):
             model.registerModel(
                 "batfishReachabilityCheck",
                 "_batfishReachabilityCheck",
-                "_action",
-                "plugins.batfish.models.action",
-            )
-        if self.version < 1.8:
-            model.registerModel(
-                "batfishRouteCheck",
-                "_batfishRouteCheck",
                 "_action",
                 "plugins.batfish.models.action",
             )

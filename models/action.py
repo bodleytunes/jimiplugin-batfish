@@ -27,7 +27,6 @@ class _batfishConnect(action._action):
         """
         # Create instance of batfish
         b_fish = Batfish(host=host, snapshot_folder=self.snapshot_folder)
-        # b_fish.init_batfish()
 
         if b_fish != None:
             data["eventData"]["remote"] = {}
@@ -52,8 +51,12 @@ class _batfishConnect(action._action):
 class _batfishAccessCheck(action._action):
 
     """
-    * Connect to existing batfish Batfish() object
+    Batfish Access Checker
+    ----------------------
+    Overview:
     * Create AccessCheck() and pass it the Batfish() client
+    * Pass source and destination, ip protocol, ports and list of nodes to check as args to AccessCheck()
+
 
     Args:
         * data: event data (flow data)
@@ -61,6 +64,8 @@ class _batfishAccessCheck(action._action):
         * data: event data (flow data)
         * rc: return code
         * result: result
+        * accept_results: (dictionary showing which nodes are permitting the access)
+        * deny_results: (list of denyresult objects that show nodes which were denied)
         * msg: Message
     """
 
@@ -85,14 +90,8 @@ class _batfishAccessCheck(action._action):
             # create instance of AccessCheck and pass original batfish object as initial arg
             ac = AccessCheck(b_fish=b_fish)
 
-            # Make the actual batfish query
-
-            (
-                permit_results,
-                deny_results,
-                accept_results,
-                merged_results,
-            ) = ac.get_results(
+            # Make the actual batfish query and received the deny and accept results
+            (deny_results, accept_results,) = ac.get_results(
                 src_ip=self.src_ip,
                 destination_ip=self.destination_ip,
                 applications=self.applications,
@@ -101,7 +100,8 @@ class _batfishAccessCheck(action._action):
                 nodes=self.nodes,
             )
 
-            # data["eventData"]["remote"]["merged_results"] = merged_results
+            # Create new fields in the data dictionary.  This is to allow for the returned data.
+
             data["eventData"]["batfish_access_query"] = {}
             data["eventData"]["batfish_access_query"] = {
                 "accept_results": accept_results
@@ -115,6 +115,7 @@ class _batfishAccessCheck(action._action):
                 exitCode = 255
 
             if exitCode == 0:
+
                 return {
                     "result": True,
                     "rc": exitCode,
@@ -143,6 +144,8 @@ class _batfishAccessCheck(action._action):
 
 
 class _batfishTraceRouteCheck(action._action):
+    #! todo WIP
+    #! Fix why some nodes are comming back with "AUTO/NONE" for next hop IP etc
 
     """
     * Connect to existing batfish Batfish() object
