@@ -219,7 +219,15 @@ class AccessCheck(Batfish):
                                                         egress_iface
                                                     )
                                                 if enum == 2:
+
                                                     accept_result.flow_details = e
+
+                                                    if (
+                                                        accept_result.flow_details.dstPort
+                                                        == "443"
+                                                    ):
+                                                        raise ("Port 443")
+
                                                     # Add details relating to IP headers/5 tuple
                                                     accept_result.destination_address = (
                                                         accept_result.flow_details.dstIp

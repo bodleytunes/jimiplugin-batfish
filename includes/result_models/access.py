@@ -18,10 +18,12 @@ class AcceptResult:
         source_address: Optional[str] = None,
         destination_address: Optional[str] = None,
         dst_ports: Optional[str] = None,
-        dst_ports_list: Optional[list] = None,
+        # test list
+        dst_ports_list: Optional[list] = [],
         service: Optional[str] = None,
         ip_protocol: Optional[str] = None,
         permit_rule: Optional[str] = None,
+        # permit_rules: Optional[List[dict]] = None,
         rule_id: Optional[str] = None,
         result_data: Optional[str] = None,
     ) -> None:
@@ -41,6 +43,7 @@ class AcceptResult:
         self.source_address = source_address
         self.destination_address = destination_address
         self.dst_ports = dst_ports
+        # test list
         self.dst_ports_list = dst_ports_list
         self.service = service
         self.ip_protocol = ip_protocol
