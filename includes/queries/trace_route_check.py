@@ -1,5 +1,6 @@
 import enum
 from typing import List
+from pandas.errors import EmptyDataError
 
 from plugins.batfish.includes.result_models.traceroute import DataviewTraceroute
 from plugins.batfish.includes.batfish import Batfish
@@ -49,13 +50,16 @@ class TraceRouteCheck(Batfish):
         result = result.answer().frame()
         # separate out Flow and Traces
         try:
+            # Todo (flow is unused currently)
             flow = result.iloc[0]["Flow"]
-        except:
-            pass
+        except EmptyDataError as e:
+            print(e)
+            raise EmptyDataError(f"No data in dataframe location: {e}")
         try:
             traces = result.iloc[0]["Traces"]
-        except:
-            pass
+        except EmptyDataError as e:
+            print(e)
+            raise EmptyDataError(f"No data in dataframe location: {e}")
 
         self.dvt = DataviewTraceroute()
 

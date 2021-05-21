@@ -1,13 +1,15 @@
-from typing import Optional, List, Tuple, DefaultDict, Any, Union
+from logging import exception
+from typing import Optional, List, Tuple, DefaultDict, Any
 import re
 from collections import defaultdict
 
 import pandas as pd
 
+from pybatfish.exception import BatfishException
 
 from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.result_models.access import AcceptResult, DeniedResult
-from pybatfish.exception import BatfishException
+from plugins.batfish.includes.bat_helpers import BatHelpers
 
 
 class AccessCheck(Batfish):
@@ -16,7 +18,7 @@ class AccessCheck(Batfish):
         batfish_server: Optional[str] = None,
         host: Optional[str] = None,
         src_ip: Optional[str] = None,
-        destination_ip: Optional[str] = None,
+        dst_ip: Optional[str] = None,
         applications: Optional[list] = None,
         dst_ports: Optional[list] = None,
         ip_protocols: List[Any] = None,
@@ -28,7 +30,7 @@ class AccessCheck(Batfish):
         self.batfish_server = batfish_server
         self.host = host
         self.src_ip = src_ip
-        self.destination_ip = destination_ip
+        self.dst_ip = dst_ip
         self.applications = applications
         self.dst_ports = dst_ports
         self.ip_protocols = ip_protocols
@@ -43,7 +45,7 @@ class AccessCheck(Batfish):
     def get_results(
         self,
         src_ip: Optional[str] = None,
-        destination_ip: Optional[str] = None,
+        dst_ip: Optional[str] = None,
         applications: Optional[list] = None,
         dst_ports: Optional[list] = None,
         ip_protocols: List[Any] = None,
@@ -53,7 +55,7 @@ class AccessCheck(Batfish):
 
         Args:
             src_ip (string, optional): source ip. Defaults to None.
-            destination_ip (string, optional): destination ip. Defaults to None.
+            dst_ip (string, optional): destination ip. Defaults to None.
             applications (list, optional): list of applications. Defaults to None.
             dst_ports (list, optional): list of destination ports. Defaults to None.
             ip_protocols (list, optional): list of protocols. Defaults to None.
@@ -64,11 +66,14 @@ class AccessCheck(Batfish):
         """
 
         self.src_ip = src_ip
-        self.destination_ip = destination_ip
+        self.dst_ip = dst_ip
         self.applications = applications
         self.dst_ports = dst_ports
         self.ip_protocols = ip_protocols
         self.nodes = nodes
+
+        # make pre-check and validation on input data
+        self._pre_flight_checks()
 
         # create empty list for returned results (Accept and Deny results)
         results_dict = defaultdict(list)
@@ -108,18 +113,30 @@ class AccessCheck(Batfish):
             # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
-                dstIps=self.destination_ip,
-                applications=self._filter_text(self.applications),
+                dstIps=self.dst_ip,
+                applications=BatHelpers.filter_text(self.applications),
             )
-
-        elif len(self.dst_ports) > 0:
-            # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
+        elif len(self.dst_ports) > 0 and len(self.ip_protocols) > 0:
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
-                dstIps=self.destination_ip,
-                dstPorts=self._filter_text(self.dst_ports),
-                ipProtocols=self._make_upper(self.ip_protocols),
+                dstIps=self.dst_ip,
+                dstPorts=BatHelpers.filter_text(self.dst_ports),
+                ipProtocols=BatHelpers.make_upper(self.ip_protocols),
             )
+        elif len(self.dst_ports) > 0:
+            flow = self.b_fish.hc(
+                srcIps=self.src_ip,
+                dstIps=self.dst_ip,
+                dstPorts=BatHelpers.filter_text(self.dst_ports),
+            )
+
+        elif len(self.ip_protocols) > 0:
+            flow = self.b_fish.hc(
+                srcIps=self.src_ip,
+                dstIps=self.dst_ip,
+                ipProtocols=BatHelpers.make_upper(self.ip_protocols),
+            )
+
         """
         make query
         """
@@ -132,7 +149,6 @@ class AccessCheck(Batfish):
         except BatfishException as e:
             print(e)
             raise BatfishException(f"Batfish Query failure :  {e}")
-            # return {}
 
     def _build_results(
         self, results_dict: DefaultDict[str, List[Any]]
@@ -313,20 +329,22 @@ class AccessCheck(Batfish):
 
         return traffic_denied_hosts
 
-    def _filter_text(self, arg: List[Any]) -> List[Any]:
-        # filter empty "" or ''
-        if arg:
+    def _pre_flight_checks(self):
 
-            def converter(i):
-                return i or None
+        # validate IP's
+        if self.src_ip:
+            self.src_ip = BatHelpers.check_valid_ip(self.src_ip)
+        if self.dst_ip:
+            self.dst_ip = BatHelpers.check_valid_ip(self.dst_ip)
+        # validate ports
+        # validate protocols
+        # validate apps
 
-            result = [converter(i) for i in arg]
-            return result
-        return arg
-
-    def _make_upper(self, arg: List[Any]) -> List[Any]:
-
-        if type(arg):
-            result = [x.upper() for x in arg]
-            return result
-        return arg
+        # sanity check source and destination exist
+        if not self.src_ip and not self.dst_ip:
+            raise exception("Need to have at least a source or dest IP")
+        # empty source/dest changed to 0.0.0.0/0
+        if not self.src_ip:
+            self.src_ip = "0.0.0.0/0"
+        if not self.dst_ip:
+            self.dst_ip = "0.0.0.0/0"

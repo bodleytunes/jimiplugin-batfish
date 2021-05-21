@@ -18,6 +18,7 @@ class AcceptResult:
         source_address: Optional[str] = None,
         destination_address: Optional[str] = None,
         dst_ports: Optional[str] = None,
+        dst_ports_list: Optional[list] = None,
         service: Optional[str] = None,
         ip_protocol: Optional[str] = None,
         permit_rule: Optional[str] = None,
@@ -40,6 +41,7 @@ class AcceptResult:
         self.source_address = source_address
         self.destination_address = destination_address
         self.dst_ports = dst_ports
+        self.dst_ports_list = dst_ports_list
         self.service = service
         self.ip_protocol = ip_protocol
         self.permit_rule = permit_rule

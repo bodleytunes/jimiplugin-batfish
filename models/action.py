@@ -71,7 +71,7 @@ class _batfishAccessCheck(action._action):
     # input data
 
     src_ip = str()
-    destination_ip = str()
+    dst_ip = str()
     applications = list()
     dst_ports = list()
     ip_protocols = list()
@@ -92,7 +92,7 @@ class _batfishAccessCheck(action._action):
             # Make the actual batfish query and received the deny and accept results
             deny_results, accept_results = ac.get_results(
                 src_ip=self.src_ip,
-                destination_ip=self.destination_ip,
+                dst_ip=self.dst_ip,
                 applications=self.applications,
                 dst_ports=self.dst_ports,
                 ip_protocols=self.ip_protocols,
