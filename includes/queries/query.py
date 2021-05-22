@@ -12,6 +12,7 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 
 from plugins.batfish.includes.batfish import Batfish
+from plugins.batfish.includes.bat_helpers import BatHelpers
 
 
 class Query(ABC):
@@ -96,10 +97,15 @@ class ProtocolAccessQuery(AccessQuery):
         self,
     ):
         # create flow
+        self.flow = self.b_fish.hc(
+            srcIps=self.src_ip,
+            dstIps=self.dst_ip,
+            ipProtocols=BatHelpers.make_upper(self.ip_protocols),
+        )
         pass
 
     def make_query(self):
-        self.b_fish.bfq()
+        self.query = self.b_fish.bfq.testFilters(headers=self.flow, nodes=self.nodes)
         pass
 
     # def make_query():
