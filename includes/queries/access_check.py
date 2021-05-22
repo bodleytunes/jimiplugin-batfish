@@ -20,7 +20,7 @@ class AccessCheck(Batfish):
         src_ip: Optional[str] = None,
         dst_ip: Optional[str] = None,
         applications: Optional[list] = None,
-        dst_ports: Optional[list] = None,
+        dst_ports: Optional[str] = None,
         ip_protocols: List[Any] = None,
         nodes: Optional[str] = None,
         snapshot_folder: Optional[str] = None,
@@ -47,7 +47,7 @@ class AccessCheck(Batfish):
         src_ip: Optional[str] = None,
         dst_ip: Optional[str] = None,
         applications: Optional[list] = None,
-        dst_ports: Optional[list] = None,
+        dst_ports: Optional[str] = None,
         ip_protocols: List[Any] = None,
         nodes: Optional[list] = None,
     ) -> Tuple[List[dict], List[dict]]:
@@ -120,14 +120,14 @@ class AccessCheck(Batfish):
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
                 dstIps=self.dst_ip,
-                dstPorts=BatHelpers.filter_text(self.dst_ports),
+                dstPorts=self.dst_ports,
                 ipProtocols=BatHelpers.make_upper(self.ip_protocols),
             )
         elif len(self.dst_ports) > 0:
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
                 dstIps=self.dst_ip,
-                dstPorts=BatHelpers.filter_text(self.dst_ports),
+                dstPorts=self.dst_ports,
             )
 
         elif len(self.ip_protocols) > 0:
@@ -222,12 +222,6 @@ class AccessCheck(Batfish):
 
                                                     accept_result.flow_details = e
 
-                                                    if (
-                                                        accept_result.flow_details.dstPort
-                                                        == "443"
-                                                    ):
-                                                        raise ("Port 443")
-
                                                     # Add details relating to IP headers/5 tuple
                                                     accept_result.destination_address = (
                                                         accept_result.flow_details.dstIp
@@ -274,10 +268,7 @@ class AccessCheck(Batfish):
 
                     else:
                         # generate a DENY entry
-                        denied_result = DeniedResult()
-
-                        denied_result.denied = True
-                        denied_result.query_node = node
+                        denied_result = DeniedResult(denied=True, query_node=node)
 
                         denied_results.append(denied_result)
 
