@@ -84,8 +84,13 @@ class PortAccessQuery(AccessQuery):
 
 
 class ProtocolAccessQuery(AccessQuery):
-    def __init__(self, protocol):
-        self.protocol = protocol
+    src_ip: str
+    dst_ip: str
+    protocol: str
+
+    def __init__(self):
+
+        self.protocol = None
 
     def _create_flow(
         self,
