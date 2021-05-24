@@ -117,14 +117,14 @@ class AccessCheck(Batfish):
         elif len(self.dst_ports) > 0 and len(self.ip_protocols) > 0:
             # send dst_ports to splitter helper
             self._split_ports(self.dst_ports)
-
+            # there are more than one port returned in the list then iterate through ports and make a query on each
             if len(self.dst_ports_list) > 1:
                 print("multiple ports")
-                for p in self.dst_ports_list:
+                for port in self.dst_ports_list:
                     flow = self.b_fish.hc(
                         srcIps=self.src_ip,
                         dstIps=self.dst_ip,
-                        dstPorts=p,
+                        dstPorts=port,
                         ipProtocols=BatHelpers.make_upper(self.ip_protocols),
                     )
                     self._make_query(flow, nodes)
