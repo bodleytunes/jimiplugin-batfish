@@ -73,7 +73,7 @@ class _batfishAccessCheck(action._action):
     src_ip = str()
     dst_ip = str()
     applications = list()
-    dst_ports = list()
+    dst_ports = str()
     ip_protocols = list()
     nodes = list()
 

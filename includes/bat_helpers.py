@@ -15,17 +15,6 @@ class BatHelpers:
         return arg
 
     @staticmethod
-    def filter_text(arg: List[Any]) -> List[Any]:
-        if arg:
-
-            def converter(i):
-                return i or None
-
-            result = [converter(i) for i in arg]
-            return result
-        return arg
-
-    @staticmethod
     def make_upper(arg: List[Any]) -> List[Any]:
         if arg:
             result = [x.upper() for x in arg]

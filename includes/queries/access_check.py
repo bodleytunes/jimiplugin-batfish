@@ -20,7 +20,7 @@ class AccessCheck(Batfish):
         src_ip: Optional[str] = None,
         dst_ip: Optional[str] = None,
         applications: Optional[list] = None,
-        dst_ports: Optional[list] = None,
+        dst_ports: Optional[str] = None,
         ip_protocols: List[Any] = None,
         nodes: Optional[str] = None,
         snapshot_folder: Optional[str] = None,
@@ -47,7 +47,7 @@ class AccessCheck(Batfish):
         src_ip: Optional[str] = None,
         dst_ip: Optional[str] = None,
         applications: Optional[list] = None,
-        dst_ports: Optional[list] = None,
+        dst_ports: Optional[str] = None,
         ip_protocols: List[Any] = None,
         nodes: Optional[list] = None,
     ) -> Tuple[List[dict], List[dict]]:
@@ -57,7 +57,7 @@ class AccessCheck(Batfish):
             src_ip (string, optional): source ip. Defaults to None.
             dst_ip (string, optional): destination ip. Defaults to None.
             applications (list, optional): list of applications. Defaults to None.
-            dst_ports (list, optional): list of destination ports. Defaults to None.
+            dst_ports (str, optional): list of destination ports. Defaults to None.
             ip_protocols (list, optional): list of protocols. Defaults to None.
             nodes (list, optional): list of nodes(network devices/firewalls etc)to query. Defaults to None.
 
@@ -112,29 +112,27 @@ class AccessCheck(Batfish):
 
             # flow is a headerConstraint object which was built from passing in args relating to the source/dst ip/proto (5 tuple etc)
             flow = self.b_fish.hc(
-                srcIps=self.src_ip,
-                dstIps=self.dst_ip,
-                applications=BatHelpers.filter_text(self.applications),
+                srcIps=self.src_ip, dstIps=self.dst_ip, applications=self.applications
             )
         elif len(self.dst_ports) > 0 and len(self.ip_protocols) > 0:
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
                 dstIps=self.dst_ip,
-                dstPorts=BatHelpers.filter_text(self.dst_ports),
+                dstPorts=self.dst_ports,
                 ipProtocols=BatHelpers.make_upper(self.ip_protocols),
             )
         elif len(self.dst_ports) > 0:
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
                 dstIps=self.dst_ip,
-                dstPorts=BatHelpers.filter_text(self.dst_ports),
+                dstPorts=self.dst_ports,
             )
 
         elif len(self.ip_protocols) > 0:
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
                 dstIps=self.dst_ip,
-                ipProtocols=BatHelpers.make_upper(self.ip_protocols),
+                ipProtocols=self.ip_protocols,
             )
 
         """
@@ -221,12 +219,6 @@ class AccessCheck(Batfish):
                                                 if enum == 2:
 
                                                     accept_result.flow_details = e
-
-                                                    if (
-                                                        accept_result.flow_details.dstPort
-                                                        == "443"
-                                                    ):
-                                                        raise ("Port 443")
 
                                                     # Add details relating to IP headers/5 tuple
                                                     accept_result.destination_address = (
