@@ -1,65 +1,35 @@
 from typing import Any, Dict, Optional, Union, List
+from dataclasses import dataclass
 
 
+@dataclass(order=True)
 class AcceptResult:
-    def __init__(
-        self,
-        query_node: Optional[str] = None,
-        flow_result: Optional[str] = None,
-        flow_details: Optional[str] = None,
-        trace_tree_list: Optional[str] = None,
-        ingress_egress: Optional[str] = None,
-        ingress_zone: Optional[str] = None,
-        ingress_interface: Optional[str] = None,
-        egress_interface: Optional[str] = None,
-        egress_zone: Optional[str] = None,
-        ingress_vrf: Optional[str] = None,
-        ingress_node: Optional[str] = None,
-        source_address: Optional[str] = None,
-        destination_address: Optional[str] = None,
-        dst_ports: Optional[str] = None,
-        # test list
-        dst_ports_list: Optional[list] = [],
-        service: Optional[str] = None,
-        ip_protocol: Optional[str] = None,
-        permit_rule: Optional[str] = None,
-        # permit_rules: Optional[List[dict]] = None,
-        rule_id: Optional[str] = None,
-        result_data: Optional[str] = None,
-    ) -> None:
-        pass
 
-        self.query_node = query_node
-        self.flow_result = flow_result
-        self.flow_details = flow_details
-        self.trace_tree_list = trace_tree_list
-        self.ingress_egress = ingress_egress
-        self.ingress_zone = ingress_zone
-        self.ingress_interface = ingress_interface
-        self.egress_interface = egress_interface
-        self.egress_zone = egress_zone
-        self.ingress_vrf = ingress_vrf
-        self.ingress_node = ingress_node
-        self.source_address = source_address
-        self.destination_address = destination_address
-        self.dst_ports = dst_ports
-        # test list
-        self.dst_ports_list = dst_ports_list
-        self.service = service
-        self.ip_protocol = ip_protocol
-        self.permit_rule = permit_rule
-        self.rule_id = rule_id
+    query_node: str = None
+    flow_result: str = None
+    flow_details: Any = None
+    trace_tree_list: Any = None
+    ingress_egress: str = None
+    ingress_zone: str = None
+    ingress_interface: str = None
+    egress_interface: str = None
+    egress_zone: str = None
+    ingress_vrf: str = None
+    ingress_node: str = None
+    source_address: str = None
+    destination_address: str = None
+    dst_ports: str = None
+    dst_ports_list: list = None
+    service: str = None
+    ip_protocol: str = None
+    permit_rule: str = None
+    rule_id: str = None
 
-        self.result_data = result_data
+    result_data: Any = None
 
 
+@dataclass
 class DeniedResult:
-    def __init__(
-        self,
-        query_node: Optional[str] = None,
-        denied: Optional[str] = None,
-    ) -> None:
-        pass
 
-        self.query_node = query_node
-        self.denied = True
+    query_node: str = None
+    denied: bool = None
