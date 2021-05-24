@@ -76,22 +76,22 @@ class AccessCheck(Batfish):
         self._pre_flight_checks()
 
         # create empty list for returned results (Accept and Deny results)
-        results_dict = defaultdict(list)
+        self.results_dict = defaultdict(list)
 
         # Loop through all passed in nodes(Network devices/Firewalls)
         for node in self.nodes:
 
             # Run access checker function to make the batfish query on a per node basis and return a result for each of them
-            result = self._query(nodes=node)
+            self._query(node)
 
             # Append each nodes query result to the list
-            results_dict[node].append(result)
+            # results_dict[node].append(result)
 
         # process results (walk dataframe) and return dictionary type data suitable for merging with eventData
         (
             deny_results,
             accept_results,
-        ) = self._build_results(results_dict)
+        ) = self._build_results(self.results_dict)
 
         # return both deny and results variables to "action"
         return deny_results, accept_results
@@ -115,18 +115,34 @@ class AccessCheck(Batfish):
                 srcIps=self.src_ip, dstIps=self.dst_ip, applications=self.applications
             )
         elif len(self.dst_ports) > 0 and len(self.ip_protocols) > 0:
+            # send dst_ports to splitter helper
+            self._split_ports(self.dst_ports)
+
+            if len(self.dst_ports_list) > 1:
+                print("multiple ports")
+                for p in self.dst_ports_list:
+                    flow = self.b_fish.hc(
+                        srcIps=self.src_ip,
+                        dstIps=self.dst_ip,
+                        dstPorts=p,
+                        ipProtocols=BatHelpers.make_upper(self.ip_protocols),
+                    )
+                    self._make_query(flow, nodes)
+
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
                 dstIps=self.dst_ip,
                 dstPorts=self.dst_ports,
                 ipProtocols=BatHelpers.make_upper(self.ip_protocols),
             )
+            self._make_query(flow, nodes)
         elif len(self.dst_ports) > 0:
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
                 dstIps=self.dst_ip,
                 dstPorts=self.dst_ports,
             )
+            self._make_query(flow, nodes)
 
         elif len(self.ip_protocols) > 0:
             flow = self.b_fish.hc(
@@ -134,7 +150,9 @@ class AccessCheck(Batfish):
                 dstIps=self.dst_ip,
                 ipProtocols=self.ip_protocols,
             )
+            self._make_query(flow, nodes)
 
+    def _make_query(self, flow, nodes):
         """
         make query
         """
@@ -143,7 +161,9 @@ class AccessCheck(Batfish):
         try:
             query = self.b_fish.bfq.testFilters(headers=flow, nodes=nodes)
             result = query.answer().frame()
-            return result
+            # Append each nodes query result to the results_dict list
+            self.results_dict[nodes].append(result)
+
         except BatfishException as e:
             print(e)
             raise BatfishException(f"Batfish Query failure :  {e}")
@@ -348,3 +368,8 @@ class AccessCheck(Batfish):
             self.src_ip = "0.0.0.0/0"
         if not self.dst_ip:
             self.dst_ip = "0.0.0.0/0"
+
+    def _split_ports(self, dst_ports):
+        # split out ports
+        # if contains comma
+        self.dst_ports_list = re.split(",|-", self.dst_ports)
