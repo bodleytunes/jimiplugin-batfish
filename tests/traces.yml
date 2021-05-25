@@ -1,0 +1,10 @@
+Traces:
+  - Trace:
+    dispostion: null
+    hops:
+      - Hop:
+        node: null
+        steps:
+          - step:
+              action: null
+              detail: null

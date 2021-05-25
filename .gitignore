@@ -222,3 +222,5 @@ FakesAssemblies/
 _Pvt_Extensions
 
 __pycache__/snmp.cpython-38.pyc
+
+**/__pycache__/**
