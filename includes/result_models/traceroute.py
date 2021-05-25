@@ -1,15 +1,15 @@
-class DataviewTraceroute:
-    def __init__(
-        self,
-    ):
-        self.trace_disposition: str
-        self.hop_node: str
-        self.originatin_vrf: str
-        self.arp_ip: str
-        self.next_hop_ip: str
-        self.resolved_next_hop_ip: str
-        self.output_interface: str
-        self.network: str
-        self.via_protocol: str
+from dataclasses import dataclass
 
-        pass
+
+@dataclass()
+class DataviewTraceroute:
+
+    trace_disposition: str = None
+    hop_node: str = None
+    originatin_vrf: str = None
+    arp_ip: str = None
+    next_hop_ip: str = None
+    resolved_next_hop_ip: str = None
+    output_interface: str = None
+    network: str = None
+    via_protocol: str = None
