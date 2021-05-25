@@ -249,8 +249,9 @@ class _batfishReachabilityCheck(action._action):
 
         try:
             b_fish = data["eventData"]["remote"]["client"]
-        except KeyError:
+        except BaseException as e:
             b_fish = None
+            raise BaseException(f"error {e}")
 
         if b_fish:
 
