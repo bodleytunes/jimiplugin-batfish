@@ -1,6 +1,5 @@
 from logging import exception
 from typing import Optional, List, Tuple, DefaultDict, Any
-import re
 from collections import defaultdict
 
 import pandas as pd
@@ -8,7 +7,6 @@ import pandas as pd
 from pybatfish.exception import BatfishException
 
 from plugins.batfish.includes.batfish import Batfish
-from plugins.batfish.includes.result_models.access import AcceptResult, DeniedResult
 from plugins.batfish.includes.bat_helpers import BatHelpers
 from plugins.batfish.includes.data.builder import AccessDataBuilder
 
@@ -77,7 +75,7 @@ class AccessCheck(Batfish):
         self._pre_flight_checks()
 
         # create empty list for returned results (Accept and Deny results)
-        self.results_dict = defaultdict(list)
+        self.results_dict: dict = defaultdict(list)
 
         # Loop through all passed in nodes(Network devices/Firewalls)
         for node in self.nodes:
