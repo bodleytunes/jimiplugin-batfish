@@ -164,3 +164,38 @@ class AccessDataBuilder(DataBuilder):
         self.accept_results = [obj.__dict__ for obj in self.accept_results]
 
         # return deny_results, accept_results
+
+    # split data delimited by ~ into separate strings
+    def _split_ingress_egress(self, ingress_egress: str) -> Tuple[str, str, str, str]:
+
+        split_list = ingress_egress.split("~")
+
+        ingress_zone = split_list[0]
+        ingress_iface = split_list[1]
+        egress_zone = split_list[3]
+        egress_iface = split_list[4]
+
+        return ingress_zone, ingress_iface, egress_zone, egress_iface
+
+    # remove any deny results if a node has an accept
+    def _remove_denied(self, accept_results, denied_results) -> List[DeniedResult]:
+        # remove denied entries
+        for a in accept_results:
+            # iterate over copy as don't delete from list while iterating
+            for d in list(denied_results):
+                if d.query_node == a.query_node:
+                    # remove this denied entry
+                    denied_results.remove(d)
+
+        return denied_results
+
+    # remove duplicate hits
+    def _remove_dupes(self, denied_results) -> list:
+
+        # make unique/remove repeated denies/duplicate nodes
+        denied_hosts_list = [d.query_node for d in denied_results]
+        unique_denied_hosts_list = set(denied_hosts_list)
+        # to list
+        traffic_denied_hosts = [unique_denied_hosts_list]
+
+        return traffic_denied_hosts

@@ -1,3 +1,4 @@
+import re
 from typing import Any, List
 import ipaddress
 
@@ -20,3 +21,9 @@ class BatHelpers:
             result = [x.upper() for x in arg]
             return result
         return arg
+
+    @staticmethod
+    def _split_ports(self, dst_ports):
+        # split out ports
+        # if contains comma
+        return re.split(",|-", dst_ports)
