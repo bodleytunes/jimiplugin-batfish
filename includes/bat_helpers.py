@@ -23,7 +23,7 @@ class BatHelpers:
         return arg
 
     @staticmethod
-    def _split_ports(self, dst_ports):
+    def _split_ports(dst_ports):
         # split out ports
         # if contains comma
         return re.split(",|-", dst_ports)

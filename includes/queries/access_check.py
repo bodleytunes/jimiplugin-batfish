@@ -1,5 +1,3 @@
-from includes.data.builder import DataBuilder
-from includes import data
 from logging import exception
 from typing import Optional, List, Tuple, DefaultDict, Any
 import re
@@ -139,7 +137,7 @@ class AccessCheck(Batfish):
             )
         elif len(self.dst_ports) > 0 and len(self.ip_protocols) > 0:
             # send dst_ports to splitter helper
-            self.dst_ports = BatHelpers._split_ports(self.dst_ports)
+            self.dst_ports_list = BatHelpers._split_ports(self.dst_ports)
             # there are more than one port returned in the list then loop through ports and make a query on each one
             if len(self.dst_ports_list) > 1:
                 print("multiple ports")
@@ -202,6 +200,6 @@ class AccessCheck(Batfish):
         Returns:
             Tuple[List[dict], List[dict]]: 2 Lists of dicts for denied results and accept results
         """
-        data_builder = DataBuilder()
+        data_builder = AccessDataBuilder()
         data_builder.build_data(results_dict)
         return data_builder.deny_results, data_builder.accept_results
