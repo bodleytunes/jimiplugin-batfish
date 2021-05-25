@@ -95,3 +95,7 @@ class Flow(Detail):
         self.ip_protocol: str
 
         pass
+
+
+# @dataclass
+# class ReachabilityResultDataView:
