@@ -6,7 +6,7 @@ class DataviewTraceroute:
 
     trace_disposition: str = None
     hop_node: str = None
-    originatin_vrf: str = None
+    originating_vrf: str = None
     arp_ip: str = None
     next_hop_ip: str = None
     resolved_next_hop_ip: str = None
