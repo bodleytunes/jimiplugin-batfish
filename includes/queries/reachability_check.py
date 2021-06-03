@@ -93,7 +93,7 @@ class ReachabilityCheck(Batfish):
         self.fl.src_ip = flow.srcIp
         self.fl.dst_ip = flow.dstIp
         self.fl.ip_protocol = flow.ipProtocol
-        self.fl.ingress_node = flow.ingressNode
+        self.fl.destination_ingress_node = flow.ingressNode
         self.fl.ingress_vrf = flow.ingressVrf
 
     def _generate_trace_data(self, traces) -> TraceResult:

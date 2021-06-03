@@ -140,7 +140,6 @@ class AccessCheck(Batfish):
             # there are more than one port returned in the list then loop through ports and make a query on each one
             if len(self.dst_ports_list) > 1:
                 # run queries on multiple ports
-                print("multiple ports")
                 for port in self.dst_ports_list:
                     flow = self.b_fish.hc(
                         srcIps=self.src_ip,
@@ -165,7 +164,7 @@ class AccessCheck(Batfish):
                 dstPorts=self.dst_ports,
             )
             self._make_query(flow, nodes)
-
+        # ip protocols
         elif len(self.ip_protocols) > 0:
             flow = self.b_fish.hc(
                 srcIps=self.src_ip,
