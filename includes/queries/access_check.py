@@ -7,11 +7,14 @@ import pandas as pd
 from pybatfish.exception import BatfishException
 
 from plugins.batfish.includes.batfish import Batfish
+
 from plugins.batfish.includes.bat_helpers import BatHelpers
 from plugins.batfish.includes.data.builder import AccessDataBuilder
 
 
 class AccessCheck(Batfish):
+  
+ 
     def __init__(
         self,
         batfish_server: Optional[str] = None,
@@ -75,6 +78,7 @@ class AccessCheck(Batfish):
         self._pre_flight_checks()
 
         # create empty list for returned results (Accept and Deny results)
+
         self.results_dict: dict = defaultdict(list)
 
         # Loop through all passed in nodes(Network devices/Firewalls)
@@ -139,6 +143,7 @@ class AccessCheck(Batfish):
             self.dst_ports_list = BatHelpers._split_ports(self.dst_ports)
             # there are more than one port returned in the list then loop through ports and make a query on each one
             if len(self.dst_ports_list) > 1:
+
                 # run queries on multiple ports
                 for port in self.dst_ports_list:
                     flow = self.b_fish.hc(
@@ -148,6 +153,7 @@ class AccessCheck(Batfish):
                         ipProtocols=BatHelpers.make_upper(self.ip_protocols),
                     )
                     self._make_query(flow, nodes)
+
             # single port
             else:
                 flow = self.b_fish.hc(
@@ -164,6 +170,7 @@ class AccessCheck(Batfish):
                 dstPorts=self.dst_ports,
             )
             self._make_query(flow, nodes)
+
         # ip protocols
         elif len(self.ip_protocols) > 0:
             flow = self.b_fish.hc(

@@ -25,6 +25,7 @@ class FlowResult(ReachabilityResult):
         self.fl.src_ip = flow.srcIp
         self.fl.dst_ip = flow.dstIp
         self.fl.ip_protocol = flow.ipProtocol
+
         self.fl.destination_ingress_node = flow.ingressNode
         self.fl.ingress_vrf = flow.ingressVrf
 
@@ -89,12 +90,14 @@ class Flow(Detail):
         self.src_ip: str
         self.dst_ip: str
         self.dst_port: str
+
         self.destination_ingress_node: str
         self.ingress_interface: str
         self.ingress_vrf: str
         self.ip_protocol: str
 
         pass
+
 
 
 # @dataclass

@@ -1,4 +1,5 @@
 from typing import Any, Dict
+
 import json
 
 from plugins.batfish.includes.batfish import Batfish
@@ -38,6 +39,7 @@ class ReachabilityCheck(Batfish):
         self.tr = TraceResult()
         self.fl = FlowResult()
 
+
         self.trace_result: dict
 
         self.b_fish = b_fish
@@ -68,6 +70,7 @@ class ReachabilityCheck(Batfish):
         # separate out Flow and Traces
         try:
             flow = result.iloc[0]["Flow"]
+
         except BaseException as e:
             raise BaseException(f"out of bounds {e}")
 
@@ -93,6 +96,7 @@ class ReachabilityCheck(Batfish):
         self.fl.src_ip = flow.srcIp
         self.fl.dst_ip = flow.dstIp
         self.fl.ip_protocol = flow.ipProtocol
+
         self.fl.destination_ingress_node = flow.ingressNode
         self.fl.ingress_vrf = flow.ingressVrf
 
@@ -189,6 +193,7 @@ class ReachabilityCheck(Batfish):
 
             # finally append trace to reachability result
             self.rr.trace_result.append(self.tr)
+
 
             # return a dictionary of the nested objects to be consumed by jimi
             self.trace_result: dict = self._build_dict(self.rr)
