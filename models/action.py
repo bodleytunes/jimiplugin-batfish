@@ -145,8 +145,7 @@ class _batfishAccessCheck(action._action):
 
 
 class _batfishTraceRouteCheck(action._action):
-    #! todo WIP
-    #! Fix why some nodes are comming back with "AUTO/NONE" for next hop IP etc
+
 
     """
     * Connect to existing batfish Batfish() object
@@ -249,8 +248,11 @@ class _batfishReachabilityCheck(action._action):
 
         try:
             b_fish = data["eventData"]["remote"]["client"]
-        except KeyError:
+
+
+        except BaseException as e:
             b_fish = None
+            raise BaseException(f"error {e}")
 
         if b_fish:
 
@@ -267,12 +269,9 @@ class _batfishReachabilityCheck(action._action):
                 dstIps=self.dst_ips,
             )
 
-            data["eventData"]["remote"]["rc_results"] = rr
 
+            data["eventData"]["remote"]["trace_results"] = rc.trace_result
             data["eventData"]["remote"]["flow_results"] = rr.flow_result.__dict__
-            data["eventData"]["remote"]["trace_results"] = [
-                obj.__dict__ for obj in rr.trace_result
-            ]
 
             if data["eventData"]["remote"]["rc_results"]:
                 exitCode = 0

@@ -1,5 +1,8 @@
 from typing import Any, Dict
 
+
+import json
+
 from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.result_models.reachability import (
     TraceResult,
@@ -37,6 +40,10 @@ class ReachabilityCheck(Batfish):
         self.tr = TraceResult()
         self.fl = FlowResult()
 
+
+
+        self.trace_result: dict
+
         self.b_fish = b_fish
 
         pass
@@ -65,13 +72,15 @@ class ReachabilityCheck(Batfish):
         # separate out Flow and Traces
         try:
             flow = result.iloc[0]["Flow"]
-        except:
-            print("out of bounds")
+
+
+        except BaseException as e:
+            raise BaseException(f"out of bounds {e}")
 
         try:
             traces = result.iloc[0]["Traces"]
-        except:
-            print("out of bounds")
+        except BaseException as e:
+            raise BaseException(f"out of bounds {e}")
 
         self.rr = ReachabilityResult()
 
@@ -90,7 +99,9 @@ class ReachabilityCheck(Batfish):
         self.fl.src_ip = flow.srcIp
         self.fl.dst_ip = flow.dstIp
         self.fl.ip_protocol = flow.ipProtocol
-        self.fl.ingress_node = flow.ingressNode
+
+
+        self.fl.destination_ingress_node = flow.ingressNode
         self.fl.ingress_vrf = flow.ingressVrf
 
     def _generate_trace_data(self, traces) -> TraceResult:
@@ -186,3 +197,12 @@ class ReachabilityCheck(Batfish):
 
             # finally append trace to reachability result
             self.rr.trace_result.append(self.tr)
+
+
+
+            # return a dictionary of the nested objects to be consumed by jimi
+            self.trace_result: dict = self._build_dict(self.rr)
+
+    # build a dictionary from the nested objects using a lambda/anonymous function
+    def _build_dict(self, obj):
+        return json.loads(json.dumps(obj, default=lambda o: o.__dict__))
