@@ -1,5 +1,6 @@
 from logging import exception
 from typing import Optional, List, Tuple, DefaultDict, Any
+
 from collections import defaultdict
 
 import pandas as pd
@@ -8,11 +9,13 @@ from pybatfish.exception import BatfishException
 
 from plugins.batfish.includes.batfish import Batfish
 
+
 from plugins.batfish.includes.bat_helpers import BatHelpers
 from plugins.batfish.includes.data.builder import AccessDataBuilder
 
 
 class AccessCheck(Batfish):
+
   
  
     def __init__(
@@ -79,6 +82,7 @@ class AccessCheck(Batfish):
 
         # create empty list for returned results (Accept and Deny results)
 
+
         self.results_dict: dict = defaultdict(list)
 
         # Loop through all passed in nodes(Network devices/Firewalls)
@@ -137,12 +141,14 @@ class AccessCheck(Batfish):
             flow = self.b_fish.hc(
                 srcIps=self.src_ip, dstIps=self.dst_ip, applications=self.applications
             )
+
             self._make_query(flow, nodes)
         elif len(self.dst_ports) > 0 and len(self.ip_protocols) > 0:
             # send dst_ports to splitter helper
             self.dst_ports_list = BatHelpers._split_ports(self.dst_ports)
             # there are more than one port returned in the list then loop through ports and make a query on each one
             if len(self.dst_ports_list) > 1:
+
 
                 # run queries on multiple ports
                 for port in self.dst_ports_list:
@@ -153,6 +159,7 @@ class AccessCheck(Batfish):
                         ipProtocols=BatHelpers.make_upper(self.ip_protocols),
                     )
                     self._make_query(flow, nodes)
+
 
             # single port
             else:
@@ -170,6 +177,7 @@ class AccessCheck(Batfish):
                 dstPorts=self.dst_ports,
             )
             self._make_query(flow, nodes)
+
 
         # ip protocols
         elif len(self.ip_protocols) > 0:
