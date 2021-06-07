@@ -102,6 +102,7 @@ class ReachabilityCheck(Batfish):
 
 
 
+
         self.fl.destination_ingress_node = flow.ingressNode
         self.fl.ingress_vrf = flow.ingressVrf
 
