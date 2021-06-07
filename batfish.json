@@ -122,7 +122,96 @@
                     }
                 }
             }
+        },
+        "batfishConnect": {
+            "display_name": "batfishConnect",
+            "className": "_batfishConnect",
+            "class_location": "models.action",
+            "description": "Batfish Connection Context",
+            "fields": [
+                {
+                    "schema_item": "host",
+                    "schema_value": "host",
+                    "type": "input",
+                    "label": "Batfish Server Host/IP",
+                    "description": "Batfish Server hostname/IP",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "snapshot_folder",
+                    "schema_value": "snapshot_folder",
+                    "type": "input",
+                    "label": "Snapshot folder",
+                    "description": "Full path to snapshot folder",
+                    "required": true,
+                    "jimi_syntax": false
+                }
+            ]
+        },
+        "batfishAccessCheck": {
+            "display_name": "batfishAccessCheck",
+            "className": "_batfishAccessCheck",
+            "class_location": "models.action",
+            "description": "Access / Policy Checker",
+            "fields": [
+                {
+                    "schema_item": "src_ip",
+                    "schema_value": "src_ip",
+                    "type": "input",
+                    "label": "Source IP",
+                    "description": "Source IP",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "dst_ip",
+                    "schema_value": "dst_ip",
+                    "type": "input",
+                    "label": "Destination IP",
+                    "description": "Destination IP",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "applications",
+                    "schema_value": "applications",
+                    "type": "input",
+                    "label": "Applications",
+                    "description": "List of applications (e.g. https, http)",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "dst_ports",
+                    "schema_value": "dst_ports",
+                    "type": "input",
+                    "label": "Destination Ports",
+                    "description": "List of destination ports if applicable",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "ip_protocols",
+                    "schema_value": "ip_protocols",
+                    "type": "input",
+                    "label": "List of protocols",
+                    "description": "List of protocols if applicable.  (E.g. TCP, UDP)",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "nodes",
+                    "schema_value": "nodes",
+                    "type": "input",
+                    "label": "List of nodes",
+                    "description": "List of nodes/devices to check policy  (E.g. fw-site2, fw-site1, fw-internet-edge, fw-dmz)",
+                    "required": true,
+                    "jimi_syntax": false
+                }
+            ]
         }
-    },
-    "settings": {}
+    }
+},
+"settings": {}
 }
