@@ -56,3 +56,11 @@ services:
 ##### Typical End to End Flow - Batfish Access/Policy Check
 
 ![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/6_batfish_access_check.png)
+
+##### Typical End to End Flow - Batfish Traceroute
+
+![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/7_batfish_traceroute_check.png)
+
+##### Typical End to End Flow - Batfish Reachability
+
+![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/8_batfish_reachability_check.png)
