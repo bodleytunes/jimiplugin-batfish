@@ -51,7 +51,7 @@ services:
 ![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/4_batfish-gitops-push.png)
 ##### Typical End to End Flow - Batfish connection
 
-![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/5_batfish_connect)
+![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/5_batfish_connect.png)
 
 ##### Typical End to End Flow - Batfish Access/Policy Check
 
