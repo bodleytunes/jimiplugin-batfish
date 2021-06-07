@@ -218,20 +218,20 @@
             "description": "Reachability and Route Check",
             "fields": [
                 {
-                    "schema_item": "src_ip",
-                    "schema_value": "src_ip",
+                    "schema_item": "src_ips",
+                    "schema_value": "src_ips",
                     "type": "input",
-                    "label": "Source IP",
-                    "description": "Source IP",
+                    "label": "Source IPs",
+                    "description": "Source IPs",
                     "required": false,
                     "jimi_syntax": false
                 },
                 {
-                    "schema_item": "dst_ip",
-                    "schema_value": "dst_ip",
+                    "schema_item": "dst_ips",
+                    "schema_value": "dst_ips",
                     "type": "input",
-                    "label": "Destination IP",
-                    "description": "Destination IP",
+                    "label": "Destination IPs",
+                    "description": "Destination IPs",
                     "required": true,
                     "jimi_syntax": false
                 },
