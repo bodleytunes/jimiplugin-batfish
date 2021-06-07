@@ -16,6 +16,9 @@ class _batfishConnect(action._action):
     snapshot_folder = str()
 
     def doAction(self, data):
+
+        self.batfish_tmp_folder = "/tmp/batfish-configs"
+
         host = helpers.evalString(self.host, {"data": data["flowData"]})
         """
         * Instanciate a batfish Batfish().init() object using "batfish host" and "snapshot folder" initial as arguments.
@@ -25,9 +28,16 @@ class _batfishConnect(action._action):
             returns: Results and Return codes
         """
         # Create instance of batfish
+
+        # Folder checks
+        if data["eventData"]["backup_args"]["dst_folder"] is not None:
+            orig_folder = data["eventData"]["backup_args"]["dst_folder"]
+            # mv snapshot folder to correct location for batfish (basically append snapshot/config and move files)
+            self.snapshot_folder = self._copy_snapshot_folder(orig_folder=orig_folder)
+
         b_fish = Batfish(host=host, snapshot_folder=self.snapshot_folder)
 
-        if b_fish != None:
+        if b_fish is not None:
             data["eventData"]["remote"] = {}
             data["eventData"]["remote"] = {"client": b_fish}
             return {"result": True, "rc": 0, "msg": "Initiated Batfish Session"}
@@ -37,6 +47,27 @@ class _batfishConnect(action._action):
                 "rc": 403,
                 "msg": "Connection failed - {0}".format("General Protection Fault!"),
             }
+
+    def _copy_snapshot_folder(self, orig_folder: str):
+        from pathlib import Path
+        import os
+        from distutils import dir_util
+
+        batfish_tmp_folder = self.batfish_tmp_folder
+
+        # folder processing
+        orig_folder = Path(orig_folder)
+        # create target folder
+        target_folder = os.path.join(batfish_tmp_folder, "snapshot/configs")
+
+        # copy everything to target folder [/tmp/batfish-configs]/snapshot/config
+        dir_util.copy_tree(orig_folder, target_folder)
+
+        # return snapshot folder which  would be the parent folder
+        # e.g. `/tmp/batfish-configs/snapshot/configs` becomes `/tmp/batfish-configs/snapshot`
+        snapshot_folder = Path(target_folder).parent.absolute()
+
+        return str(snapshot_folder)
 
     def setAttribute(self, attr, value, sessionData=None):
         if attr == "password" and not value.startswith("ENC "):
