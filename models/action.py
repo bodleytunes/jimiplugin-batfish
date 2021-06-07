@@ -177,6 +177,7 @@ class _batfishAccessCheck(action._action):
 
 class _batfishTraceRouteCheck(action._action):
 
+
     """
     * Connect to existing batfish Batfish() object
     * Create TraceRouteCheck() and pass it the Batfish() client
@@ -278,6 +279,8 @@ class _batfishReachabilityCheck(action._action):
 
         try:
             b_fish = data["eventData"]["remote"]["client"]
+
+
         except BaseException as e:
             b_fish = None
             raise BaseException(f"error {e}")
@@ -296,6 +299,7 @@ class _batfishReachabilityCheck(action._action):
                 start_node=self.start_node,
                 dstIps=self.dst_ips,
             )
+
 
             data["eventData"]["remote"]["trace_results"] = rc.trace_result
             data["eventData"]["remote"]["flow_results"] = rr.flow_result.__dict__

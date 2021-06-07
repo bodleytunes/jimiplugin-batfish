@@ -20,6 +20,7 @@ class NodeProperties(Batfish):
         return result
 
 
+
 ####################################################
 
 
