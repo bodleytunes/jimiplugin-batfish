@@ -89,8 +89,6 @@ class Flow(Detail):
         self.src_ip: str
         self.dst_ip: str
         self.dst_port: str
-
-
         self.destination_ingress_node: str
         self.ingress_interface: str
         self.ingress_vrf: str
