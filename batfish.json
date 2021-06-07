@@ -210,6 +210,41 @@
                     "jimi_syntax": false
                 }
             ]
+        },
+        "batfishReachabilityCheck": {
+            "display_name": "batfishReachabilityCheck",
+            "className": "_batfishReachabilityCheck",
+            "class_location": "models.action",
+            "description": "Reachability and Route Check",
+            "fields": [
+                {
+                    "schema_item": "src_ip",
+                    "schema_value": "src_ip",
+                    "type": "input",
+                    "label": "Source IP",
+                    "description": "Source IP",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "dst_ip",
+                    "schema_value": "dst_ip",
+                    "type": "input",
+                    "label": "Destination IP",
+                    "description": "Destination IP",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "start_node",
+                    "schema_value": "start_node",
+                    "type": "input",
+                    "label": "Start Node",
+                    "description": "Start Node, e.g. fw-internet-edge",
+                    "required": true,
+                    "jimi_syntax": false
+                }
+            ]
         }
     }
 }
