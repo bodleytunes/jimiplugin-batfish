@@ -101,6 +101,8 @@ class ReachabilityCheck(Batfish):
         self.fl.ip_protocol = flow.ipProtocol
 
 
+
+
         self.fl.destination_ingress_node = flow.ingressNode
         self.fl.ingress_vrf = flow.ingressVrf
 
