@@ -29,13 +29,23 @@ class _batfishConnect(action._action):
         """
         # Create instance of batfish
 
-        # Folder checks
-        if data["eventData"]["backup_args"]["dst_folder"] is not None:
-            orig_folder = data["eventData"]["backup_args"]["dst_folder"]
-            # mv snapshot folder to correct location for batfish (basically append snapshot/config and move files)
-            self.snapshot_folder = self._copy_snapshot_folder(orig_folder=orig_folder)
+        # Folder checks - checks to see if key exists which would have been passed from an upstream git backup flow
+        # if it exists it should use that as the source dst folder and also create a copy of it with the correct
+        # structure for batfish "../snapshot/configs"
+        try:
+            if data["eventData"]["backup_args"]["dst_folder"] is not None:
+                orig_folder = data["eventData"]["backup_args"]["dst_folder"]
+                # copy snapshot folder to correct location for batfish (basically append snapshot/config and move files)
+                self.snapshot_folder = self._copy_snapshot_folder(
+                    orig_folder=orig_folder
+                )
+        except KeyError as e:
+            print(f"Key doesn't exist: {e}")
+            pass
+
 
         b_fish = Batfish(host=host, snapshot_folder=self.snapshot_folder)
+  
 
         if b_fish is not None:
             data["eventData"]["remote"] = {}
@@ -177,7 +187,6 @@ class _batfishAccessCheck(action._action):
 
 class _batfishTraceRouteCheck(action._action):
 
-
     """
     * Connect to existing batfish Batfish() object
     * Create TraceRouteCheck() and pass it the Batfish() client
@@ -280,7 +289,6 @@ class _batfishReachabilityCheck(action._action):
         try:
             b_fish = data["eventData"]["remote"]["client"]
 
-
         except BaseException as e:
             b_fish = None
             raise BaseException(f"error {e}")
@@ -299,7 +307,6 @@ class _batfishReachabilityCheck(action._action):
                 start_node=self.start_node,
                 dstIps=self.dst_ips,
             )
-
 
             data["eventData"]["remote"]["trace_results"] = rc.trace_result
             data["eventData"]["remote"]["flow_results"] = rr.flow_result.__dict__

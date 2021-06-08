@@ -122,7 +122,173 @@
                     }
                 }
             }
+        },
+        "batfishConnect": {
+            "display_name": "batfishConnect",
+            "className": "_batfishConnect",
+            "class_location": "models.action",
+            "description": "Batfish Connection Context",
+            "fields": [
+                {
+                    "schema_item": "host",
+                    "schema_value": "host",
+                    "type": "input",
+                    "label": "Batfish Server Host/IP",
+                    "description": "Batfish Server hostname/IP",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "snapshot_folder",
+                    "schema_value": "snapshot_folder",
+                    "type": "input",
+                    "label": "Snapshot folder",
+                    "description": "Full path to snapshot folder",
+                    "required": true,
+                    "jimi_syntax": false
+                }
+            ]
+        },
+        "batfishAccessCheck": {
+            "display_name": "batfishAccessCheck",
+            "className": "_batfishAccessCheck",
+            "class_location": "models.action",
+            "description": "Access / Policy Checker",
+            "fields": [
+                {
+                    "schema_item": "src_ip",
+                    "schema_value": "src_ip",
+                    "type": "input",
+                    "label": "Source IP",
+                    "description": "Source IP",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "dst_ip",
+                    "schema_value": "dst_ip",
+                    "type": "input",
+                    "label": "Destination IP",
+                    "description": "Destination IP",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "applications",
+                    "schema_value": "applications",
+                    "type": "input",
+                    "label": "Applications",
+                    "description": "List of applications (e.g. https, http)",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "dst_ports",
+                    "schema_value": "dst_ports",
+                    "type": "input",
+                    "label": "Destination Ports",
+                    "description": "List of destination ports if applicable",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "ip_protocols",
+                    "schema_value": "ip_protocols",
+                    "type": "input",
+                    "label": "List of protocols",
+                    "description": "List of protocols if applicable.  (E.g. TCP, UDP)",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "nodes",
+                    "schema_value": "nodes",
+                    "type": "input",
+                    "label": "List of nodes",
+                    "description": "List of nodes/devices to check policy  (E.g. fw-site2, fw-site1, fw-internet-edge, fw-dmz)",
+                    "required": true,
+                    "jimi_syntax": false
+                }
+            ]
+        },
+        "batfishReachabilityCheck": {
+            "display_name": "batfishReachabilityCheck",
+            "className": "_batfishReachabilityCheck",
+            "class_location": "models.action",
+            "description": "Reachability and Route Check",
+            "fields": [
+                {
+                    "schema_item": "src_ips",
+                    "schema_value": "src_ips",
+                    "type": "input",
+                    "label": "Source IPs",
+                    "description": "Source IPs",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "dst_ips",
+                    "schema_value": "dst_ips",
+                    "type": "input",
+                    "label": "Destination IPs",
+                    "description": "Destination IPs",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "start_node",
+                    "schema_value": "start_node",
+                    "type": "input",
+                    "label": "Start Node",
+                    "description": "Start Node, e.g. fw-internet-edge",
+                    "required": true,
+                    "jimi_syntax": false
+                }
+            ]
+        },
+        "batfishTraceRouteCheck": {
+            "display_name": "batfishTraceRouteCheck",
+            "className": "_batfishTraceRouteCheck",
+            "class_location": "models.action",
+            "description": "Traceroute Check",
+            "fields": [
+                {
+                    "schema_item": "src_ip",
+                    "schema_value": "src_ip",
+                    "type": "input",
+                    "label": "Source IP",
+                    "description": "Source IP",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "destination_ip",
+                    "schema_value": "destination_ip",
+                    "type": "input",
+                    "label": "Destination IP/Network",
+                    "description": "Lookup route for destination IP/Network",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "start_interface",
+                    "schema_value": "start_interface",
+                    "type": "input",
+                    "label": "Start Interface",
+                    "description": "interface to simulate route lookup from, e.g. port1, port2, eth0",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "start_node",
+                    "schema_value": "start_node",
+                    "type": "input",
+                    "label": "Start Node",
+                    "description": "Node/Device simulate route lookup from, e.g. fw-internet-edge, hub1, dmz-fw1 etc",
+                    "required": true,
+                    "jimi_syntax": false
+                }
+            ]
         }
-    },
-    "settings": {}
+    }
 }
