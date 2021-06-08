@@ -29,13 +29,21 @@ class _batfishConnect(action._action):
         """
         # Create instance of batfish
 
-        # Folder checks
-        if data["eventData"]["backup_args"]["dst_folder"] is not None:
-            orig_folder = data["eventData"]["backup_args"]["dst_folder"]
-            # mv snapshot folder to correct location for batfish (basically append snapshot/config and move files)
-            self.snapshot_folder = self._copy_snapshot_folder(orig_folder=orig_folder)
+        # Folder checks - checks to see if key exists which would have been passed from an upstream git backup flow
+        # if it exists it should use that as the source dst folder and also create a copy of it with the correct
+        # structure for batfish "../snapshot/configs"
+        try:
+            if data["eventData"]["backup_args"]["dst_folder"] is not None:
+                orig_folder = data["eventData"]["backup_args"]["dst_folder"]
+                # copy snapshot folder to correct location for batfish (basically append snapshot/config and move files)
+                self.snapshot_folder = self._copy_snapshot_folder(
+                    orig_folder=orig_folder
+                )
+        except KeyError as e:
+            print(f"Key doesn't exist: {e}")
 
         b_fish = Batfish(host=host, snapshot_folder=self.snapshot_folder)
+  
 
         if b_fish is not None:
             data["eventData"]["remote"] = {}
