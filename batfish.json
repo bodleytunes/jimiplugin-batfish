@@ -245,6 +245,50 @@
                     "jimi_syntax": false
                 }
             ]
+        },
+        "batfishTraceRouteCheck": {
+            "display_name": "batfishTraceRouteCheck",
+            "className": "_batfishTraceRouteCheck",
+            "class_location": "models.action",
+            "description": "Traceroute Check",
+            "fields": [
+                {
+                    "schema_item": "src_ip",
+                    "schema_value": "src_ip",
+                    "type": "input",
+                    "label": "Source IP",
+                    "description": "Source IP",
+                    "required": false,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "destination_ip",
+                    "schema_value": "destination_ip",
+                    "type": "input",
+                    "label": "Destination IP/Network",
+                    "description": "Lookup route for destination IP/Network",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "start_interface",
+                    "schema_value": "start_interface",
+                    "type": "input",
+                    "label": "Start Interface",
+                    "description": "interface to simulate route lookup from, e.g. port1, port2, eth0",
+                    "required": true,
+                    "jimi_syntax": false
+                },
+                {
+                    "schema_item": "start_node",
+                    "schema_value": "start_node",
+                    "type": "input",
+                    "label": "Start Node",
+                    "description": "Node/Device simulate route lookup from, e.g. fw-internet-edge, hub1, dmz-fw1 etc",
+                    "required": true,
+                    "jimi_syntax": false
+                }
+            ]
         }
     }
 }
