@@ -34,17 +34,14 @@ services:
 
 ![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/typical-end-to-end-flow.png)
 
-##### Typical End to End Flow - Config Backup Connection details
+##### Typical End to End Flow - RemoteConnectFortigate details
 
-![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/1_batfish-cfg-backup-connect.png)
+![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/1_batfish_download_connect_fortigate.png)
 
-##### Typical End to End Flow - Fortigate connection details
+##### Typical End to End Flow - RemoteConnectDownload Config - (Fortigate save config)
 
-![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/2_batfish-cfgbackupFortigateConnect.png)
+![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/2_batfish_download_configs.png)
 
-##### Typical End to End Flow
-
-![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/3_batfish-cfgbackupSave.png)
 
 ##### Typical End to End Flow - git ops
 
