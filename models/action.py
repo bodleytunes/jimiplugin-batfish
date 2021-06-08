@@ -43,6 +43,7 @@ class _batfishConnect(action._action):
             print(f"Key doesn't exist: {e}")
             pass
 
+
         b_fish = Batfish(host=host, snapshot_folder=self.snapshot_folder)
   
 
