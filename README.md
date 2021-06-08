@@ -40,7 +40,7 @@ services:
 
 ##### Typical End to End Flow - RemoteConnectDownload Config - (Fortigate save config)
 
-![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/2_batfish_download_configs.png)
+![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/2_batfish-cfgbackupFortigateConnect.png)
 
 
 ##### Typical End to End Flow - git ops
