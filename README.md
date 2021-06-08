@@ -34,6 +34,12 @@ services:
 
 ![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/typical-end-to-end-flow.png)
 
+##### Typical End to End Flow
+
+![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/end-to-end-flow2.png)
+
+
+
 ##### Typical End to End Flow - RemoteConnectFortigate details
 
 ![Screenshot](https://github.com/bodleytunes/jimiplugin-batfish/blob/dev/1_batfish_download_connect_fortigate.png)
