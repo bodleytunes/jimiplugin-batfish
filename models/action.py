@@ -127,16 +127,8 @@ class _batfishAccessCheck(action._action):
 
         if b_fish:
 
-            # create instance of AccessCheck and pass original batfish object as initial arg
-            ac = AccessCheck(b_fish=b_fish)
-
-            # Make the actual batfish query and received the deny and accept results
-            accept_results, deny_results = self._batfish_query(ac)
-
-            # Create new fields in the data dictionary.  This is to allow for the returned data.
-            self._create_eventdata_items(data, accept_results, deny_results)
-
-            exitCode = self._get_accept_results_rc(data)
+            # do Batfish related tasks such as query etc
+            exitCode = self._do_batfish(b_fish, data)
 
             if exitCode == 0:
                 return self.success_result(data, exitCode)
@@ -144,6 +136,19 @@ class _batfishAccessCheck(action._action):
                 return self.fail_result()
         else:
             return {"result": False, "rc": 403, "msg": "No connection found"}
+
+    def _do_batfish(self, b_fish, data):
+        # create instance of AccessCheck and pass original batfish object as initial arg
+        ac = AccessCheck(b_fish=b_fish)
+
+        # Make the batfish query and received the deny and accept results
+        accept_results, deny_results = self._batfish_query(ac)
+
+        # Create new fields in the data dictionary.  This is to allow for the returned data.
+        self._create_eventdata_items(data, accept_results, deny_results)
+
+        exitCode = self._get_accept_results_rc(data)
+        return exitCode
 
     def _batfish_query(self, ac) -> Tuple[AcceptResult, DeniedResult]:
         # Make the actual batfish query and received the deny and accept results
