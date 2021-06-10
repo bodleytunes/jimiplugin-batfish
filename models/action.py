@@ -129,23 +129,12 @@ class _batfishAccessCheck(action._action):
             ac = AccessCheck(b_fish=b_fish)
 
             # Make the actual batfish query and received the deny and accept results
-            deny_results, accept_results = ac.get_results(
-                src_ip=self.src_ip,
-                dst_ip=self.dst_ip,
-                applications=self.applications,
-                dst_ports=self.dst_ports,
-                ip_protocols=self.ip_protocols,
-                nodes=self.nodes,
-            )
+            accept_results, deny_results = self._batfish_query(ac)
 
             # Create new fields in the data dictionary.  This is to allow for the returned data.
+            self._create_eventdata_items(data, accept_results, deny_results)
 
-            self.newmethod738(data, accept_results, deny_results)
-
-            if (len(data["eventData"]["batfish_access_query"]["accept_results"])) > 0:
-                exitCode = 0
-            else:
-                exitCode = 255
+            exitCode = self._get_accept_results_rc(data)
 
             if exitCode == 0:
                 return self.success_result(data, exitCode)
@@ -154,7 +143,26 @@ class _batfishAccessCheck(action._action):
         else:
             return {"result": False, "rc": 403, "msg": "No connection found"}
 
-    def newmethod738(self, data, accept_results, deny_results):
+    def _batfish_query(self, ac):
+        # Make the actual batfish query and received the deny and accept results
+        deny_results, accept_results = ac.get_results(
+            src_ip=self.src_ip,
+            dst_ip=self.dst_ip,
+            applications=self.applications,
+            dst_ports=self.dst_ports,
+            ip_protocols=self.ip_protocols,
+            nodes=self.nodes,
+        )
+        return accept_results, deny_results
+
+    def _get_accept_results_rc(self, data):
+        if (len(data["eventData"]["batfish_access_query"]["accept_results"])) > 0:
+            exitCode = 0
+        else:
+            exitCode = 255
+        return exitCode
+
+    def _create_eventdata_items(self, data, accept_results, deny_results):
         # Create new fields in the data dictionary.  This is to allow for the returned data.
 
         data["eventData"]["batfish_access_query"] = {}
