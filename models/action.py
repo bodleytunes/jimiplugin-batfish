@@ -43,9 +43,7 @@ class _batfishConnect(action._action):
             print(f"Key doesn't exist: {e}")
             pass
 
-
         b_fish = Batfish(host=host, snapshot_folder=self.snapshot_folder)
-  
 
         if b_fish is not None:
             data["eventData"]["remote"] = {}
@@ -142,12 +140,7 @@ class _batfishAccessCheck(action._action):
 
             # Create new fields in the data dictionary.  This is to allow for the returned data.
 
-            data["eventData"]["batfish_access_query"] = {}
-            data["eventData"]["batfish_access_query"] = {
-                "accept_results": accept_results
-            }
-            data["eventData"]["batfish_access_query"]["deny_results"] = {}
-            data["eventData"]["batfish_access_query"]["deny_results"] = deny_results
+            self.newmethod738(data, accept_results, deny_results)
 
             if (len(data["eventData"]["batfish_access_query"]["accept_results"])) > 0:
                 exitCode = 0
@@ -155,26 +148,40 @@ class _batfishAccessCheck(action._action):
                 exitCode = 255
 
             if exitCode == 0:
-                # remove batfish connection object
-                data["eventData"]["remote"] = {}
-
-                return {
-                    "result": True,
-                    "rc": exitCode,
-                    "msg": "Query Successful",
-                    "data": data,
-                    "errors": "",
-                }
+                return self.success_result(data, exitCode)
             else:
-                return {
-                    "result": False,
-                    "rc": 255,
-                    "msg": "General Protection Fault!",
-                    "data": "",
-                    "errors": "",
-                }
+                return self.fail_result()
         else:
             return {"result": False, "rc": 403, "msg": "No connection found"}
+
+    def newmethod738(self, data, accept_results, deny_results):
+        # Create new fields in the data dictionary.  This is to allow for the returned data.
+
+        data["eventData"]["batfish_access_query"] = {}
+        data["eventData"]["batfish_access_query"] = {"accept_results": accept_results}
+        data["eventData"]["batfish_access_query"]["deny_results"] = {}
+        data["eventData"]["batfish_access_query"]["deny_results"] = deny_results
+
+    def fail_result(self):
+        return {
+            "result": False,
+            "rc": 255,
+            "msg": "General Protection Fault!",
+            "data": "",
+            "errors": "",
+        }
+
+    def success_result(self, data, exitCode):
+        # remove batfish connection object
+        data["eventData"]["remote"] = {}
+
+        return {
+            "result": True,
+            "rc": exitCode,
+            "msg": "Query Successful",
+            "data": data,
+            "errors": "",
+        }
 
     def setAttribute(self, attr, value, sessionData=None):
         if attr == "password" and not value.startswith("ENC "):
