@@ -1,6 +1,8 @@
 # from plugins.batfish.includes.helpers import generate_new_dict
+from includes.result_models.access import AcceptResult, DeniedResult
 from core.models import action
 from core import auth, helpers
+from typing import Tuple
 
 from plugins.batfish.includes.batfish import Batfish
 from plugins.batfish.includes.queries.access_check import AccessCheck
@@ -116,7 +118,7 @@ class _batfishAccessCheck(action._action):
     ip_protocols = list()
     nodes = list()
 
-    def doAction(self, data):
+    def doAction(self, data) -> dict:
 
         try:
             b_fish = data["eventData"]["remote"]["client"]
@@ -143,7 +145,7 @@ class _batfishAccessCheck(action._action):
         else:
             return {"result": False, "rc": 403, "msg": "No connection found"}
 
-    def _batfish_query(self, ac):
+    def _batfish_query(self, ac) -> Tuple[AcceptResult, DeniedResult]:
         # Make the actual batfish query and received the deny and accept results
         deny_results, accept_results = ac.get_results(
             src_ip=self.src_ip,
@@ -155,7 +157,7 @@ class _batfishAccessCheck(action._action):
         )
         return accept_results, deny_results
 
-    def _get_accept_results_rc(self, data):
+    def _get_accept_results_rc(self, data) -> int:
         if (len(data["eventData"]["batfish_access_query"]["accept_results"])) > 0:
             exitCode = 0
         else:
@@ -170,7 +172,7 @@ class _batfishAccessCheck(action._action):
         data["eventData"]["batfish_access_query"]["deny_results"] = {}
         data["eventData"]["batfish_access_query"]["deny_results"] = deny_results
 
-    def fail_result(self):
+    def fail_result(self) -> dict:
         return {
             "result": False,
             "rc": 255,
@@ -179,7 +181,7 @@ class _batfishAccessCheck(action._action):
             "errors": "",
         }
 
-    def success_result(self, data, exitCode):
+    def success_result(self, data, exitCode) -> dict:
         # remove batfish connection object
         data["eventData"]["remote"] = {}
 
