@@ -254,29 +254,37 @@ class _batfishTraceRouteCheck(action._action):
 
             self.results_to_eventdata(results_list, data)
 
-            if (len(data["eventData"]["remote"]["traceroute_results"])) > 0:
-                exitCode = 0
+            if self.check_traceroute_result(data):
+                return self.return_success(data, exitCode=0)
             else:
-                exitCode = 255
+                return self.return_fail()
 
-            if exitCode == 0:
-                return {
-                    "result": True,
-                    "rc": exitCode,
-                    "msg": "Query Successful",
-                    "data": data,
-                    "errors": "",
-                }
-            else:
-                return {
-                    "result": False,
-                    "rc": 255,
-                    "msg": "General Protection Fault!",
-                    "data": "",
-                    "errors": "",
-                }
         else:
-            return {"result": False, "rc": 403, "msg": "No connection found"}
+            return self.return_403()
+
+    def return_403(self):
+        return {"result": False, "rc": 403, "msg": "No connection found"}
+
+    def return_fail(self):
+        return {
+            "result": False,
+            "rc": 255,
+            "msg": "General Protection Fault!",
+            "data": "",
+            "errors": "",
+        }
+
+    def return_success(self, exitCode, data):
+        return {
+            "result": True,
+            "rc": exitCode,
+            "msg": "Query Successful",
+            "data": data,
+            "errors": "",
+        }
+
+    def check_traceroute_result(self, data):
+        return (len(data["eventData"]["remote"]["traceroute_results"])) > 0
 
     def results_to_eventdata(self, results_list, data):
         data["eventData"]["remote"]["traceroute_results"] = results_list
