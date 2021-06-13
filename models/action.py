@@ -1,3 +1,7 @@
+from pathlib import Path
+import os
+from distutils import dir_util
+
 # from plugins.batfish.includes.helpers import generate_new_dict
 from core.models import action
 from core import auth, helpers
@@ -33,35 +37,44 @@ class _batfishConnect(action._action):
         # if it exists it should use that as the source dst folder and also create a copy of it with the correct
         # structure for batfish "../snapshot/configs"
         try:
-            if data["eventData"]["backup_args"]["dst_folder"] is not None:
-                orig_folder = data["eventData"]["backup_args"]["dst_folder"]
-                # copy snapshot folder to correct location for batfish (basically append snapshot/config and move files)
-                self.snapshot_folder = self._copy_snapshot_folder(
-                    orig_folder=orig_folder
-                )
+            self.check_dst_folder(data)
         except KeyError as e:
             print(f"Key doesn't exist: {e}")
             pass
 
-
-        b_fish = Batfish(host=host, snapshot_folder=self.snapshot_folder)
-  
+        b_fish = self.get_batfish_object(host)
 
         if b_fish is not None:
-            data["eventData"]["remote"] = {}
-            data["eventData"]["remote"] = {"client": b_fish}
-            return {"result": True, "rc": 0, "msg": "Initiated Batfish Session"}
+            self.batfish_to_eventdata(data, b_fish)
+            return self.get_rc_success()
         else:
-            return {
-                "result": False,
-                "rc": 403,
-                "msg": "Connection failed - {0}".format("General Protection Fault!"),
-            }
+            return self.get_rc_fail()
+
+    def get_rc_fail(self):
+        return {
+            "result": False,
+            "rc": 403,
+            "msg": "Connection failed - {0}".format("General Protection Fault!"),
+        }
+
+    def get_rc_success(self):
+        return {"result": True, "rc": 0, "msg": "Initiated Batfish Session"}
+
+    def batfish_to_eventdata(self, data, b_fish):
+        data["eventData"]["remote"] = {}
+        data["eventData"]["remote"] = {"client": b_fish}
+
+    def get_batfish_object(self, host):
+        b_fish = Batfish(host=host, snapshot_folder=self.snapshot_folder)
+        return b_fish
+
+    def check_dst_folder(self, data):
+        if data["eventData"]["backup_args"]["dst_folder"] is not None:
+            orig_folder = data["eventData"]["backup_args"]["dst_folder"]
+            # copy snapshot folder to correct location for batfish (basically append snapshot/config and move files)
+            self.snapshot_folder = self._copy_snapshot_folder(orig_folder=orig_folder)
 
     def _copy_snapshot_folder(self, orig_folder: str):
-        from pathlib import Path
-        import os
-        from distutils import dir_util
 
         batfish_tmp_folder = self.batfish_tmp_folder
 
@@ -128,53 +141,73 @@ class _batfishAccessCheck(action._action):
         if b_fish:
 
             # create instance of AccessCheck and pass original batfish object as initial arg
-            ac = AccessCheck(b_fish=b_fish)
+            ac = self.get_access_check_instance(b_fish)
 
             # Make the actual batfish query and received the deny and accept results
-            deny_results, accept_results = ac.get_results(
-                src_ip=self.src_ip,
-                dst_ip=self.dst_ip,
-                applications=self.applications,
-                dst_ports=self.dst_ports,
-                ip_protocols=self.ip_protocols,
-                nodes=self.nodes,
-            )
+            accept_results, deny_results = self.get_results(ac)
 
             # Create new fields in the data dictionary.  This is to allow for the returned data.
+            self.create_accept_results_in_eventdata(data, accept_results)
+            self.create_deny_results_in_eventdata(data, deny_results)
 
-            data["eventData"]["batfish_access_query"] = {}
-            data["eventData"]["batfish_access_query"] = {
-                "accept_results": accept_results
-            }
-            data["eventData"]["batfish_access_query"]["deny_results"] = {}
-            data["eventData"]["batfish_access_query"]["deny_results"] = deny_results
-
-            if (len(data["eventData"]["batfish_access_query"]["accept_results"])) > 0:
-                exitCode = 0
-            else:
-                exitCode = 255
-
-            if exitCode == 0:
+            if self.check_acceptresult_success(data):
                 # remove batfish connection object
-                data["eventData"]["remote"] = {}
-
-                return {
-                    "result": True,
-                    "rc": exitCode,
-                    "msg": "Query Successful",
-                    "data": data,
-                    "errors": "",
-                }
+                return self.return_success(data, exitCode=0)
             else:
-                return {
-                    "result": False,
-                    "rc": 255,
-                    "msg": "General Protection Fault!",
-                    "data": "",
-                    "errors": "",
-                }
+                return self.return_fail()
         else:
-            return {"result": False, "rc": 403, "msg": "No connection found"}
+            return self.return_403()
+
+    def return_403(self):
+        return {"result": False, "rc": 403, "msg": "No connection found"}
+
+    def check_acceptresult_success(self, data):
+        return (len(data["eventData"]["batfish_access_query"]["accept_results"])) > 0
+
+    def return_fail(self):
+        return {
+            "result": False,
+            "rc": 255,
+            "msg": "General Protection Fault!",
+            "data": "",
+            "errors": "",
+        }
+
+    def return_success(self, data, exitCode):
+        # remove batfish connection object
+        data["eventData"]["remote"] = {}
+
+        return {
+            "result": True,
+            "rc": exitCode,
+            "msg": "Query Successful",
+            "data": data,
+            "errors": "",
+        }
+
+    def create_deny_results_in_eventdata(self, data, deny_results):
+        data["eventData"]["batfish_access_query"]["deny_results"] = {}
+        data["eventData"]["batfish_access_query"]["deny_results"] = deny_results
+
+    def create_accept_results_in_eventdata(self, data, accept_results):
+        data["eventData"]["batfish_access_query"] = {}
+        data["eventData"]["batfish_access_query"] = {"accept_results": accept_results}
+
+    def get_access_check_instance(self, b_fish):
+        # create instance of AccessCheck and pass original batfish object as initial arg
+        ac = AccessCheck(b_fish=b_fish)
+        return ac
+
+    def get_results(self, ac):
+        deny_results, accept_results = ac.get_results(
+            src_ip=self.src_ip,
+            dst_ip=self.dst_ip,
+            applications=self.applications,
+            dst_ports=self.dst_ports,
+            ip_protocols=self.ip_protocols,
+            nodes=self.nodes,
+        )
+        return accept_results, deny_results
 
     def setAttribute(self, attr, value, sessionData=None):
         if attr == "password" and not value.startswith("ENC "):
@@ -210,24 +243,16 @@ class _batfishTraceRouteCheck(action._action):
     def doAction(self, data):
 
         try:
-            b_fish = data["eventData"]["remote"]["client"]
+            self.get_batfish_object(data)
         except KeyError:
             b_fish = None
 
         if b_fish:
 
-            rc = TraceRouteCheck(
-                b_fish=b_fish,
-                start_node=self.start_node,
-                start_interface=self.start_interface,
-            )
-            results, results_list = rc.check(
-                destination_ip=self.destination_ip,
-                start_node=self.start_node,
-                start_interface=self.start_interface,
-            )
+            rc = self.get_traceroute_check(b_fish)
+            results_list = self.get_results(rc)
 
-            data["eventData"]["remote"]["traceroute_results"] = results_list
+            self.results_to_eventdata(results_list, data)
 
             if (len(data["eventData"]["remote"]["traceroute_results"])) > 0:
                 exitCode = 0
@@ -252,6 +277,29 @@ class _batfishTraceRouteCheck(action._action):
                 }
         else:
             return {"result": False, "rc": 403, "msg": "No connection found"}
+
+    def results_to_eventdata(self, results_list, data):
+        data["eventData"]["remote"]["traceroute_results"] = results_list
+
+    def get_results(self, rc):
+        results, results_list = rc.check(
+            destination_ip=self.destination_ip,
+            start_node=self.start_node,
+            start_interface=self.start_interface,
+        )
+        return results_list
+
+    def get_traceroute_check(self, b_fish):
+        rc = TraceRouteCheck(
+            b_fish=b_fish,
+            start_node=self.start_node,
+            start_interface=self.start_interface,
+        )
+
+        return rc
+
+    def get_batfish_object(self, data):
+        b_fish = data["eventData"]["remote"]["client"]
 
     def setAttribute(self, attr, value, sessionData=None):
         if attr == "password" and not value.startswith("ENC "):
